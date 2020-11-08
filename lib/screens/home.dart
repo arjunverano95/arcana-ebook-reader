@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:arcana_ebook_reader/screens/favorites.dart';
 import 'package:arcana_ebook_reader/screens/library.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
@@ -5,6 +7,7 @@ import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:arcana_ebook_reader/util/importBooks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:isolate_handler/isolate_handler.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
 class Home extends StatelessWidget {
@@ -25,9 +28,8 @@ class HomeBody extends StatefulWidget {
 class HomeBodyState extends State<HomeBody> {
   HomeBodyState();
   bool _loading = true;
-  double _progress = 0.0;
   List<Book> _books;
-
+  final isolates = IsolateHandler();
   @override
   void initState() {
     super.initState();
@@ -46,6 +48,7 @@ class HomeBodyState extends State<HomeBody> {
           children: [
             Container(
               height: 150,
+              width: 110.4,
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
@@ -58,9 +61,23 @@ class HomeBodyState extends State<HomeBody> {
                 ],
               ),
               child: ClipRect(
-                child: book.coverImageData == null
-                    ? Image.asset('assets/images/no_cover.jpg')
-                    : Image.memory(book.coverImageData),
+                child: FutureBuilder(
+                  future: book.getCoverImageData(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<int>> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting &&
+                        snapshot.hasData == false) {
+                      return Image.asset('assets/images/no_cover.jpg');
+                    } else {
+                      var image = snapshot.data;
+                      if (image == null) {
+                        return Image.asset('assets/images/no_cover.jpg');
+                      } else {
+                        return Image.memory(image);
+                      }
+                    }
+                  },
+                ),
               ),
             ),
             Expanded(
@@ -76,7 +93,9 @@ class HomeBodyState extends State<HomeBody> {
                       children: [
                         Expanded(
                           child: Text(
-                            book.title,
+                            (book.title.length < 40)
+                                ? book.title
+                                : book.title.substring(0, 40) + "...",
                             style: TextStyle(
                                 color: CustomColors.textDark,
                                 fontWeight: FontWeight.bold,
@@ -151,16 +170,24 @@ class HomeBodyState extends State<HomeBody> {
     );
   }
 
+  void mapBooks(String res) {
+    var books =
+        (json.decode(res) as List).map((i) => Book.fromJson(i)).toList();
+    setState(() {
+      _books = books;
+      _loading = false;
+    });
+    isolates.kill('getBooks');
+  }
+
   void _getBooks() {
     setState(() {
-      _progress = null;
       _loading = true;
     });
-    Book.get().then((value) => setState(() {
-          _books = value;
-          _progress = null;
-          _loading = false;
-        }));
+    isolates.spawn<String>(getBooks,
+        name: 'getBooks',
+        onReceive: mapBooks,
+        onInitialized: () => isolates.send("startIsolate", to: 'getBooks'));
   }
 
   Widget _recentRead(Book book) {
@@ -175,7 +202,8 @@ class HomeBodyState extends State<HomeBody> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
-                height: 250,
+                height: 230,
+                width: 169,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: [
@@ -188,9 +216,23 @@ class HomeBodyState extends State<HomeBody> {
                   ],
                 ),
                 child: ClipRect(
-                  child: book.coverImageData == null
-                      ? Image.asset('assets/images/no_cover.jpg')
-                      : Image.memory(book.coverImageData),
+                  child: FutureBuilder(
+                    future: book.getCoverImageData(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<int>> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting &&
+                          snapshot.hasData == false) {
+                        return Image.asset('assets/images/no_cover.jpg');
+                      } else {
+                        var image = snapshot.data;
+                        if (image == null) {
+                          return Image.asset('assets/images/no_cover.jpg');
+                        } else {
+                          return Image.memory(image);
+                        }
+                      }
+                    },
+                  ),
                 ),
               ),
               Expanded(
@@ -206,7 +248,9 @@ class HomeBodyState extends State<HomeBody> {
                         children: [
                           Expanded(
                             child: Text(
-                              book.title,
+                              (book.title.length < 40)
+                                  ? book.title
+                                  : book.title.substring(0, 40) + "...",
                               style: TextStyle(
                                   color: CustomColors.textDark,
                                   fontWeight: FontWeight.bold,
@@ -471,11 +515,7 @@ class HomeBodyState extends State<HomeBody> {
       body: LoadingOverlay(
         color: CustomColors.normal,
         isLoading: _loading,
-        progressIndicator: _progress == null
-            ? CircularProgressIndicator()
-            : LinearProgressIndicator(
-                value: _progress,
-              ),
+        progressIndicator: CircularProgressIndicator(),
         child: SingleChildScrollView(
           child: ConstrainedBox(
             constraints: BoxConstraints(),
@@ -528,10 +568,6 @@ class HomeBodyState extends State<HomeBody> {
                           setState(() {
                             _loading = loading;
                           });
-                        }, (double progress) {
-                          setState(() {
-                            _progress = progress;
-                          });
                         }, _getBooks)
                       },
                       icon: Icon(Icons.file_download, color: Colors.white),
@@ -549,4 +585,14 @@ class HomeBodyState extends State<HomeBody> {
       ),
     );
   }
+}
+
+// This function happens in the isolate.
+void getBooks(Map<String, dynamic> context) {
+  final messenger = HandledIsolate.initialize(context);
+
+  messenger.listen((msg) async {
+    String books = await Book.getJson();
+    messenger.send(books);
+  });
 }

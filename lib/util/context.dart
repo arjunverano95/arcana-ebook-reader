@@ -17,7 +17,7 @@ class Book {
   int isFavorite;
   String fileName;
   String coverImage;
-  List<int> coverImageData;
+  List<int> _coverImageData;
 
   Book()
       : id = "",
@@ -30,8 +30,8 @@ class Book {
         addedDate = null,
         isFavorite = 0,
         fileName = "",
-        coverImage = "",
-        coverImageData = null;
+        coverImage = "";
+  //coverImageData = null;
 
   Book.fromJson(Map<String, dynamic> json)
       : id = json['id'],
@@ -107,7 +107,7 @@ class Book {
 
       var coverImage = "";
       if (coverData != null) {
-        coverImage =  await _addToDir(newBook.id + ".jpg", coverData);
+        coverImage = await _addToDir(newBook.id + ".jpg", coverData);
         //coverImage = base64Encode(coverData);
       }
 
@@ -178,7 +178,7 @@ class Book {
     }
   }
 
-  static Future<List<int>>_getCoverImageData(String coverImage) async {
+  static Future<List<int>> _getCoverImageData(String coverImage) async {
     try {
       //get cover
       if (coverImage == "") return null;
@@ -188,7 +188,7 @@ class Book {
       final imagePath = '$appDirectoryPath/$coverImage';
       final imageFile = File(imagePath);
 
-     // var coverImageData = base64Decode(coverImage);
+      // var coverImageData = base64Decode(coverImage);
       var coverImageData = await imageFile.readAsBytes();
       return coverImageData;
     } catch (ex) {
@@ -218,12 +218,42 @@ class Book {
           .map((i) => Book.fromJson(i))
           .toList();
 
-      for (var i = 0; i < library.length; i++) {
-        library[i].coverImageData =await Book._getCoverImageData(library[i].coverImage);
-      }
+      // for (var i = 0; i < library.length; i++) {
+      //   library[i].coverImageData =await Book._getCoverImageData(library[i].coverImage);
+      // }
       return library;
     } catch (ex) {
       return null;
     }
+  }
+
+  static Future<String> getJson() async {
+    try {
+      //check libray on AppData
+      final appDirectory = await getApplicationDocumentsDirectory();
+      final appDirectoryPath = appDirectory.path;
+      final configPath = '$appDirectoryPath/library.json';
+      final configFile = File(configPath);
+      final exists = await configFile.exists();
+      //if not exist copy template from asset
+      if (!exists) {
+        await configFile.create();
+        String jsonString =
+            await rootBundle.loadString('assets/data/library.json');
+        await configFile.writeAsString(jsonString);
+      }
+      // Read the libray.
+      String jsonString = await configFile.readAsString();
+
+      return jsonString;
+    } catch (ex) {
+      return null;
+    }
+  }
+
+  Future<List<int>> getCoverImageData() async {
+    if (this._coverImageData == null && this.coverImage != null)
+      this._coverImageData = await _getCoverImageData(this.coverImage);
+    return this._coverImageData;
   }
 }

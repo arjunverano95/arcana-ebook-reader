@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:flutter/material.dart';
+import 'package:isolate_handler/isolate_handler.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
 class Favorites extends StatelessWidget {
@@ -22,6 +25,7 @@ class FavoritesBodyState extends State<FavoritesBody> {
   String _sort = "asc";
   bool _loading = true;
   List<Book> _books;
+  final isolates = IsolateHandler();
   @override
   void initState() {
     super.initState();
@@ -40,6 +44,7 @@ class FavoritesBodyState extends State<FavoritesBody> {
           children: [
             Container(
               height: 150,
+              width: 110.4,
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
@@ -52,9 +57,23 @@ class FavoritesBodyState extends State<FavoritesBody> {
                 ],
               ),
               child: ClipRect(
-                child:  book.coverImageData == null
-                    ? Image.asset('assets/images/no_cover.jpg')
-                    : Image.memory(book.coverImageData),
+                child: FutureBuilder(
+                  future: book.getCoverImageData(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<int>> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting &&
+                        snapshot.hasData == false) {
+                      return Image.asset('assets/images/no_cover.jpg');
+                    } else {
+                      var image = snapshot.data;
+                      if (image == null) {
+                        return Image.asset('assets/images/no_cover.jpg');
+                      } else {
+                        return Image.memory(image);
+                      }
+                    }
+                  },
+                ),
               ),
             ),
             Expanded(
@@ -70,7 +89,7 @@ class FavoritesBodyState extends State<FavoritesBody> {
                       children: [
                         Expanded(
                           child: Text(
-                            book.title,
+                            (book.title.length < 40)? book.title : book.title.substring(0,40)+ "...",
                             style: TextStyle(
                                 color: CustomColors.textDark,
                                 fontWeight: FontWeight.bold,
@@ -86,9 +105,10 @@ class FavoritesBodyState extends State<FavoritesBody> {
                               Icons.more_vert,
                               size: 22,
                             ),
-                            onSelected: (String result)  {
+                            onSelected: (String result) {
                               if (result == "Delete") {
-                                 Book.delete(book.id).then((value) => _getBooks());
+                                Book.delete(book.id)
+                                    .then((value) => _getBooks());
                               }
                             },
                             itemBuilder: (BuildContext context) =>
@@ -218,14 +238,24 @@ class FavoritesBodyState extends State<FavoritesBody> {
     );
   }
 
+   void mapBooks(String res) {
+    var books =
+        (json.decode(res) as List).map((i) => Book.fromJson(i)).toList();
+    setState(() {
+      _books = books;
+      _loading = false;
+    });
+    isolates.kill('getBooks');
+  }
+
   void _getBooks() {
     setState(() {
       _loading = true;
     });
-    Book.get().then((value) => setState(() {
-          _books = value;
-          _loading = false;
-        }));
+    isolates.spawn<String>(getBooks,
+        name: 'getBooks',
+        onReceive: mapBooks,
+        onInitialized: () => isolates.send("startIsolate", to: 'getBooks'));
   }
 
   Widget _listBooks(List<Book> books) {
@@ -291,4 +321,13 @@ class FavoritesBodyState extends State<FavoritesBody> {
       ),
     );
   }
+}
+// This function happens in the isolate.
+void getBooks(Map<String, dynamic> context) {
+  final messenger = HandledIsolate.initialize(context);
+
+  messenger.listen((msg) async {
+    String books = await Book.getJson();
+    messenger.send(books);
+  });
 }

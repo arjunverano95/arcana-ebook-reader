@@ -1,77 +1,96 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:isolate_handler/isolate_handler.dart';
 import 'package:uuid/uuid.dart';
 import 'package:epub/epub.dart' as Epub;
 import 'package:image/image.dart' as ImageObj;
 
-void openFileDialog(Function(bool) setLoading, Function(double) reportProgress,
-    Function callback) async {
+
+void openFileDialog(Function(bool) setLoading, Function callback) {
   setLoading(true);
-  reportProgress(null);
-  FilePickerResult result = await FilePicker.platform.pickFiles(
+  final isolates = IsolateHandler();
+  FilePicker.platform.pickFiles(
     allowMultiple: false,
     type: FileType.custom,
     allowedExtensions: ['epub'],
-  );
-  if (result != null) {
-    if (result.files.length > 0) {
-      _importBooks(result.files, reportProgress).then((value) {
+  ).then((result) async {
+    if (result != null) {
+      if (result.files.length > 0) {
+
+        // SINGLE FILE ONLY
+        String file = result.files[0].path  + "|"+  result.files[0].extension.toLowerCase();
+        isolates.spawn<bool>(importBooks,
+            name: 'importBooks',
+            onReceive: (value) {
+              isolates.kill('importBooks');
+              setLoading(false);
+              callback();
+            },
+            onInitialized: () =>
+                isolates.send(file, to: 'importBooks'));
+
+        // _importBooks(result.files).then((value) {
+        //   setLoading(false);
+        //   callback();
+        // });
+      } else {
         setLoading(false);
-        callback();
-      });
+      }
     } else {
       setLoading(false);
     }
-  } else {
+  }).catchError(() {
     setLoading(false);
-  }
+  });
 }
 
-Future<void> _importBooks(
-    List<PlatformFile> files, Function(double) reportProgress) async {
-  double iter = ((100 / files.length) / 4) * 0.01;
-  double pg = 0.0;
+// This function happens in the isolate.
+void importBooks(Map<String, dynamic> context) {
+  final messenger = HandledIsolate.initialize(context);
 
-  reportProgress(pg);
-  for (var i = 0; i < files.length; i++) {
-    PlatformFile file = files[i];
-    if (file.extension.toLowerCase() == "epub") {
-      String uKey = Uuid().v1();
-      var epubFile = File(file.path);
-      List<int> bytes = await epubFile.readAsBytes();
-      pg += iter;
-      reportProgress(pg);
+  messenger.listen((file) async {
+    List<String> fileObj = file.toString().split("|");
+    String filePath = fileObj[0];
+    String fileExt = fileObj[1];
+    bool value = await _importBooks(filePath,fileExt);
+    messenger.send(value);
+  });
+}
 
-      Epub.EpubBookRef epubBook = await Epub.EpubReader.openBook(bytes);
+Future<bool> _importBooks(String filePath,String fileExt) async { // List<PlatformFile> files
 
-      pg += iter;
-      reportProgress(pg);
+  //for (var i = 0; i < files.length; i++) {
+  //PlatformFile file = files[0];
+  if (fileExt == "epub") {
+    String uKey = Uuid().v1();
+    var epubFile = File(filePath);
+    Uint8List bytes = await epubFile.readAsBytes();
 
-      ImageObj.Image coverImage = await epubBook.readCover();
+    Epub.EpubBookRef epubBook = await Epub.EpubReader.openBook(bytes);
 
-      pg += iter;
-      reportProgress(pg);
+    ImageObj.Image coverImage = await epubBook.readCover();
 
-      List<int> imageBytes;
-      if (coverImage != null) {
-        ImageObj.Image thumbnail =
-            ImageObj.copyResize(coverImage, width: 195, height: 265);
-        imageBytes = ImageObj.encodeJpg(thumbnail, quality: 90);
-      }
-
-      Book newBook = new Book();
-      newBook.id = uKey;
-      newBook.title = epubBook.Title;
-      newBook.author = epubBook.Author;
-      newBook.addedDate = DateTime.now();
-      newBook.lastRead = DateTime.now();
-      newBook.isFavorite = 0;
-      await Book.add(newBook, file.extension, bytes, imageBytes);
-
-      pg += iter;
-      reportProgress(pg);
+    List<int> imageBytes;
+    if (coverImage != null) {
+      ImageObj.Image thumbnail =
+          ImageObj.copyResize(coverImage, width: 195, height: 265);
+      imageBytes = ImageObj.encodeJpg(thumbnail);
+      if(imageBytes == null) imageBytes = ImageObj.encodePng(thumbnail);
+      //if(imageBytes == null) imageBytes = ImageObj.encodeGif(thumbnail);
     }
+
+    Book newBook = new Book();
+    newBook.id = uKey;
+    newBook.title = epubBook.Title;
+    newBook.author = epubBook.Author;
+    newBook.addedDate = DateTime.now();
+    newBook.lastRead = DateTime.now();
+    newBook.isFavorite = 0;
+    await Book.add(newBook, fileExt, bytes, imageBytes);
   }
+  //}
+  return true;
 }

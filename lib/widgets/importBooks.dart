@@ -9,7 +9,7 @@ import 'package:epub/epub.dart' as Epub;
 import 'package:image/image.dart' as ImageObj;
 
 
-void openFileDialog(Function(bool) setLoading, Function callback) {
+void openImportDialog(Function(bool) setLoading, Function callback) {
   setLoading(true);
   final isolates = IsolateHandler();
   FilePicker.platform.pickFiles(

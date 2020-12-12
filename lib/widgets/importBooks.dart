@@ -1,17 +1,16 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:isolate_handler/isolate_handler.dart';
+// import 'package:isolate_handler/isolate_handler.dart';
 import 'package:uuid/uuid.dart';
 import 'package:epub/epub.dart' as Epub;
 import 'package:image/image.dart' as ImageObj;
 
-
-void openImportDialog(Function(bool) setLoading, Function callback) {
-  setLoading(true);
-  final isolates = IsolateHandler();
+void openImportDialog() {
+  // final isolates = IsolateHandler();
   FilePicker.platform.pickFiles(
     allowMultiple: false,
     type: FileType.custom,
@@ -19,48 +18,40 @@ void openImportDialog(Function(bool) setLoading, Function callback) {
   ).then((result) async {
     if (result != null) {
       if (result.files.length > 0) {
-
         // SINGLE FILE ONLY
-        String file = result.files[0].path  + "|"+  result.files[0].extension.toLowerCase();
-        isolates.spawn<bool>(importBooks,
-            name: 'importBooks',
-            onReceive: (value) {
-              isolates.kill('importBooks');
-              setLoading(false);
-              callback();
-            },
-            onInitialized: () =>
-                isolates.send(file, to: 'importBooks'));
 
-        // _importBooks(result.files).then((value) {
-        //   setLoading(false);
-        //   callback();
-        // });
-      } else {
-        setLoading(false);
+        // String file = result.files[0].path  + "|"+  result.files[0].extension.toLowerCase();
+        // isolates.spawn<bool>(importBooks,
+        //     name: 'importBooks',
+        //     onReceive: (value) {
+        //       isolates.kill('importBooks');
+        //     },
+        //     onInitialized: () =>
+        //         isolates.send(file, to: 'importBooks'));
+
+        _importBooks(
+                result.files[0].path, result.files[0].extension.toLowerCase())
+            .then((value) => env.bookstore.getBooks());
       }
-    } else {
-      setLoading(false);
     }
-  }).catchError(() {
-    setLoading(false);
   });
 }
 
 // This function happens in the isolate.
-void importBooks(Map<String, dynamic> context) {
-  final messenger = HandledIsolate.initialize(context);
+// void importBooks(Map<String, dynamic> context) {
+//   final messenger = HandledIsolate.initialize(context);
 
-  messenger.listen((file) async {
-    List<String> fileObj = file.toString().split("|");
-    String filePath = fileObj[0];
-    String fileExt = fileObj[1];
-    bool value = await _importBooks(filePath,fileExt);
-    messenger.send(value);
-  });
-}
+//   messenger.listen((file) async {
+//     List<String> fileObj = file.toString().split("|");
+//     String filePath = fileObj[0];
+//     String fileExt = fileObj[1];
+//     bool value = await _importBooks(filePath,fileExt);
+//     messenger.send(value);
+//   });
+// }
 
-Future<bool> _importBooks(String filePath,String fileExt) async { // List<PlatformFile> files
+Future<bool> _importBooks(String filePath, String fileExt) async {
+  // List<PlatformFile> files
 
   //for (var i = 0; i < files.length; i++) {
   //PlatformFile file = files[0];
@@ -78,7 +69,7 @@ Future<bool> _importBooks(String filePath,String fileExt) async { // List<Platfo
       ImageObj.Image thumbnail =
           ImageObj.copyResize(coverImage, width: 195, height: 265);
       imageBytes = ImageObj.encodeJpg(thumbnail);
-      if(imageBytes == null) imageBytes = ImageObj.encodePng(thumbnail);
+      if (imageBytes == null) imageBytes = ImageObj.encodePng(thumbnail);
       //if(imageBytes == null) imageBytes = ImageObj.encodeGif(thumbnail);
     }
 

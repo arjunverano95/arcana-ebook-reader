@@ -1,5 +1,5 @@
-import 'dart:convert';
 
+import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/screens/favorites.dart';
 import 'package:arcana_ebook_reader/screens/library.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
@@ -8,8 +8,9 @@ import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:arcana_ebook_reader/widgets/importBooks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:isolate_handler/isolate_handler.dart';
-import 'package:loading_overlay/loading_overlay.dart';
+
 
 class Home extends StatelessWidget {
   Home();
@@ -28,13 +29,10 @@ class HomeBody extends StatefulWidget {
 
 class HomeBodyState extends State<HomeBody> {
   HomeBodyState();
-  bool _loading = true;
-  List<Book> _books;
   final isolates = IsolateHandler();
   @override
   void initState() {
     super.initState();
-    _getBooks();
   }
 
   Widget _buildRows(Book book, int index) {
@@ -44,43 +42,40 @@ class HomeBodyState extends State<HomeBody> {
     );
   }
 
-  void mapBooks(String res) {
-    var books =
-        (json.decode(res) as List).map((i) => Book.fromJson(i)).toList();
-    setState(() {
-      _books = books;
-      _loading = false;
-    });
-    isolates.kill('getBooks');
-  }
+  Widget _recentRead() {
+    Book recentRead;
+    if (env.bookstore.books != null && env.bookstore.books.length > 0) {
+      List<Book> recentReads = List.from(env.bookstore.books);
+      recentReads.removeWhere((item) => item.lastRead == null);
+      if (recentReads.length > 0) {
+        recentReads.sort((a, b) => b.lastRead.compareTo(a.lastRead));
+        recentRead = recentReads[0];
+      }
+    }
 
-  void _getBooks() {
-    setState(() {
-      _loading = true;
-    });
-    isolates.spawn<String>(getBooks,
-        name: 'getBooks',
-        onReceive: mapBooks,
-        onInitialized: () => isolates.send("startIsolate", to: 'getBooks'));
-  }
-
-  Widget _recentRead(Book book) {
-    if (book != null) {
-      return BookTile(book: book, size: CoverSize.lg);
+    if (recentRead != null) {
+      return BookTile(book: recentRead, size: CoverSize.lg);
     } else {
       return Container();
     }
   }
 
-  Widget _recentAdded(List<Book> books) {
-    if (books != null && books.length > 0) {
+  Widget _recentAdded() {
+    List<Book> recentAdded;
+    if (env.bookstore.books != null && env.bookstore.books.length > 0) {
+      recentAdded = List.from(env.bookstore.books);
+      recentAdded.sort((a, b) => b.addedDate.compareTo(a.addedDate));
+      recentAdded = recentAdded.take(7).toList();
+    }
+
+    if (recentAdded != null && recentAdded.length > 0) {
       return ListView.builder(
           shrinkWrap: true,
           primary: false,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: books.length,
+          itemCount: recentAdded.length,
           itemBuilder: (context, i) {
-            return _buildRows(books[i], i);
+            return _buildRows(recentAdded[i], i);
           });
     } else {
       return Container();
@@ -89,20 +84,6 @@ class HomeBodyState extends State<HomeBody> {
 
   @override
   Widget build(BuildContext context) {
-    Book recentRead;
-    List<Book> recentAdded;
-    if (_books != null && _books.length > 0) {
-      List<Book> recentReads = List.from(_books);
-      recentReads.removeWhere((item) => item.lastRead == null);
-      if (recentReads.length > 0) {
-        recentReads.sort((a, b) => b.lastRead.compareTo(a.lastRead));
-        recentRead = recentReads[0];
-      }
-
-      recentAdded = List.from(_books);
-      recentAdded.sort((a, b) => b.addedDate.compareTo(a.addedDate));
-      recentAdded = recentAdded.take(7).toList();
-    }
     return Scaffold(
       backgroundColor: CustomColors.background,
       drawer: Drawer(
@@ -140,8 +121,6 @@ class HomeBodyState extends State<HomeBody> {
                     builder: (context) => new Library(),
                   ),
                 );
-
-                _getBooks();
               },
             ),
             ListTile(
@@ -160,7 +139,6 @@ class HomeBodyState extends State<HomeBody> {
                     builder: (context) => new Favorites(),
                   ),
                 );
-                _getBooks();
               },
             ),
             ListTile(
@@ -184,93 +162,73 @@ class HomeBodyState extends State<HomeBody> {
         title: Text('Arcana Ebook Reader'),
         backgroundColor: CustomColors.normal,
       ),
-      body: LoadingOverlay(
-        color: CustomColors.normal,
-        isLoading: _loading,
-        progressIndicator: CircularProgressIndicator(),
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(),
-            child: Column(children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(top: 15),
-                child: _recentRead(recentRead),
-              ),
-              Container(
-                margin: EdgeInsets.only(top: 15, left: 15, right: 15),
-                padding: EdgeInsets.only(bottom: 5),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                        width: 1,
-                        color: CustomColors.normal,
-                        style: BorderStyle.solid),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      "RECENTLY ADDED",
-                      style: TextStyle(
-                        color: CustomColors.textNormal,
-                        fontSize: 15,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.only(top: 15),
-                child: _recentAdded(recentAdded),
-              ),
-              Container(
-                margin: EdgeInsets.all(15),
-                decoration: (recentAdded != null && recentAdded.length > 0)
-                    ? BoxDecoration(
-                        border: Border(
-                          top: BorderSide(
-                              width: 1,
-                              color: CustomColors.normal,
-                              style: BorderStyle.solid),
-                        ),
-                      )
-                    : null,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    RaisedButton.icon(
+      body: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(),
+          child: Column(children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(top: 15),
+              child: Observer(builder: (_) => _recentRead()),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 15, left: 15, right: 15),
+              padding: EdgeInsets.only(bottom: 5),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                      width: 1,
                       color: CustomColors.normal,
-                      onPressed: () => {
-                        openImportDialog((bool loading) {
-                          setState(() {
-                            _loading = loading;
-                          });
-                        }, _getBooks)
-                      },
-                      icon: Icon(Icons.file_download, color: Colors.white),
-                      label: Text(
-                        "Import books",
-                        style: TextStyle(color: Colors.white, fontSize: 15),
-                      ),
-                    ),
-                  ],
+                      style: BorderStyle.solid),
                 ),
               ),
-            ]),
-          ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    "RECENTLY ADDED",
+                    style: TextStyle(
+                      color: CustomColors.textNormal,
+                      fontSize: 15,
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.only(top: 15),
+              child: Observer(builder: (_) => _recentAdded()),
+            ),
+            Container(
+              margin: EdgeInsets.all(15),
+              decoration:
+                  (env.bookstore.books != null && env.bookstore.books.length > 0)
+                      ? BoxDecoration(
+                          border: Border(
+                            top: BorderSide(
+                                width: 1,
+                                color: CustomColors.normal,
+                                style: BorderStyle.solid),
+                          ),
+                        )
+                      : null,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  RaisedButton.icon(
+                    color: CustomColors.normal,
+                    onPressed: () => {openImportDialog()},
+                    icon: Icon(Icons.file_download, color: Colors.white),
+                    label: Text(
+                      "Import books",
+                      style: TextStyle(color: Colors.white, fontSize: 15),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ]),
         ),
       ),
     );
   }
-}
-
-// This function happens in the isolate.
-void getBooks(Map<String, dynamic> context) {
-  final messenger = HandledIsolate.initialize(context);
-
-  messenger.listen((msg) async {
-    String books = await Book.getJson();
-    messenger.send(books);
-  });
 }

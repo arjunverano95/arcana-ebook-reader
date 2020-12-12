@@ -1,12 +1,13 @@
-import 'dart:convert';
 
+import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:arcana_ebook_reader/widgets/importBooks.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:isolate_handler/isolate_handler.dart';
-import 'package:loading_overlay/loading_overlay.dart';
+
 
 class Library extends StatelessWidget {
   Library();
@@ -26,41 +27,24 @@ class LibraryBodyState extends State<LibraryBody> {
   LibraryBodyState();
   final GlobalKey<ScaffoldState> _key = GlobalKey();
   String _sort = "asc";
-  bool _loading = true;
-  List<Book> _books;
   final isolates = IsolateHandler();
   @override
   void initState() {
     super.initState();
-
-    _getBooks();
   }
 
   Widget _buildRows(Book book, int index) {
-    return BookTile(book:book);
+    return BookTile(book: book);
   }
 
-  void mapBooks(String res) {
-    var books =
-        (json.decode(res) as List).map((i) => Book.fromJson(i)).toList();
-    setState(() {
-      _books = books;
-      _loading = false;
-    });
-    isolates.kill('getBooks');
-  }
+  Widget _listBooks() {
+    List<Book> books = List.from(env.bookstore.books);
 
-  void _getBooks() {
-    setState(() {
-      _loading = true;
-    });
-    isolates.spawn<String>(getBooks,
-        name: 'getBooks',
-        onReceive: mapBooks,
-        onInitialized: () => isolates.send("startIsolate", to: 'getBooks'));
-  }
+    if (books != null && _sort == "asc")
+      books.sort((a, b) => a.title.compareTo(b.title));
+    if (books != null && _sort == "desc")
+      books.sort((a, b) => b.title.compareTo(a.title));
 
-  Widget _listBooks(List<Book> books) {
     if (books != null && books.length > 0) {
       return ListView.builder(
           shrinkWrap: true,
@@ -77,11 +61,6 @@ class LibraryBodyState extends State<LibraryBody> {
 
   @override
   Widget build(BuildContext context) {
-    if (_books != null && _sort == "asc")
-      _books.sort((a, b) => a.title.compareTo(b.title));
-    if (_books != null && _sort == "desc")
-      _books.sort((a, b) => b.title.compareTo(a.title));
-
     return Scaffold(
       key: _key,
       backgroundColor: CustomColors.background,
@@ -115,11 +94,7 @@ class LibraryBodyState extends State<LibraryBody> {
               ),
               onTap: () {
                 Navigator.of(context).pop();
-                openImportDialog((bool loading) {
-                  setState(() {
-                    _loading = loading;
-                  });
-                }, _getBooks);
+                openImportDialog();
               },
             ),
             // ListTile(
@@ -167,27 +142,16 @@ class LibraryBodyState extends State<LibraryBody> {
           },
         ),
       ),
-      body: LoadingOverlay(
-        color: CustomColors.normal,
-        isLoading: _loading,
-        progressIndicator: CircularProgressIndicator(),
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(),
-            child: Column(children: <Widget>[_listBooks(_books)]),
-          ),
+      body: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(),
+          child: Column(children: [
+            Observer(
+              builder: (_) => _listBooks(),
+            )
+          ]),
         ),
       ),
     );
   }
 }
-// This function happens in the isolate.
-void getBooks(Map<String, dynamic> context) {
-  final messenger = HandledIsolate.initialize(context);
-
-  messenger.listen((msg) async {
-    String books = await Book.getJson();
-    messenger.send(books);
-  });
-}
-

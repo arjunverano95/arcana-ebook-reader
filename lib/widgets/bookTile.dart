@@ -1,8 +1,11 @@
+
+import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:flutter/material.dart';
 
 enum CoverSize { md, lg } //sm, xl
+
 
 class BookTile extends StatefulWidget {
   final Book book;
@@ -114,9 +117,8 @@ class _BookTileState extends State<BookTile> {
                             ),
                             onSelected: (String result) {
                               if (result == "Delete") {
-                                // TODO Refresh list
-                                // Book.delete(book.id)
-                                //     .then((value) => _getBooks());
+                                Book.delete(book.id)
+                                    .then((value) => env.bookstore.getBooks());
                               }
                             },
                             itemBuilder: (BuildContext context) =>
@@ -222,12 +224,12 @@ class _BookTileState extends State<BookTile> {
                                           ? Colors.red
                                           : CustomColors.normal,
                                       onPressed: () {
-                                        book.updateFavorite();
+                                        book.updateFavorite().then(
+                                            (value) => env.bookstore.getBooks());
                                         setState(() {
                                           book.isFavorite =
                                               book.isFavorite == 1 ? 0 : 1;
                                         });
-                                        // TODO Refresh list
                                       },
                                     ),
                                   )

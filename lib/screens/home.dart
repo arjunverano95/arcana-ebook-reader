@@ -1,4 +1,3 @@
-
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/screens/favorites.dart';
 import 'package:arcana_ebook_reader/screens/library.dart';
@@ -10,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:isolate_handler/isolate_handler.dart';
-
 
 class Home extends StatelessWidget {
   Home();
@@ -95,6 +93,11 @@ class HomeBodyState extends State<HomeBody> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  Container(
+                    height: 80,
+                    width: 80,
+                    child: Image.asset('assets/images/arcana_ebook_reader_filled.png'),
+                  ),
                   Text(
                     'Arcana Ebook Reader',
                     style: TextStyle(color: Colors.white, fontSize: 20),
@@ -200,17 +203,17 @@ class HomeBodyState extends State<HomeBody> {
             ),
             Container(
               margin: EdgeInsets.all(15),
-              decoration:
-                  (env.bookstore.books != null && env.bookstore.books.length > 0)
-                      ? BoxDecoration(
-                          border: Border(
-                            top: BorderSide(
-                                width: 1,
-                                color: CustomColors.normal,
-                                style: BorderStyle.solid),
-                          ),
-                        )
-                      : null,
+              decoration: (env.bookstore.books != null &&
+                      env.bookstore.books.length > 0)
+                  ? BoxDecoration(
+                      border: Border(
+                        top: BorderSide(
+                            width: 1,
+                            color: CustomColors.normal,
+                            style: BorderStyle.solid),
+                      ),
+                    )
+                  : null,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [

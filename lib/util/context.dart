@@ -17,7 +17,7 @@ class Book {
   int isFavorite;
   String fileName;
   String coverImage;
-  List<int> _coverImageData;
+  List<int> coverImageData;
 
   Book()
       : id = "",
@@ -54,10 +54,10 @@ class Book {
         "progressPage": progressPage,
         "progressPercent": progressPercent,
         "lastRead": lastRead != null
-            ? DateFormat('yyyy-MM-dd HH:mm').format(lastRead)
+            ? DateFormat('yyyy-MM-dd HH:mm:ss').format(lastRead)
             : "",
         "addedDate": addedDate != null
-            ? DateFormat('yyyy-MM-dd HH:mm').format(addedDate)
+            ? DateFormat('yyyy-MM-dd HH:mm:ss').format(addedDate)
             : "",
         "isFavorite": isFavorite,
         "fileName": fileName,
@@ -189,8 +189,8 @@ class Book {
       final imageFile = File(imagePath);
 
       // var coverImageData = base64Decode(coverImage);
-      var coverImageData = await imageFile.readAsBytes();
-      return coverImageData;
+      var image = await imageFile.readAsBytes();
+      return image;
     } catch (ex) {
       return null;
     }
@@ -252,8 +252,8 @@ class Book {
   }
 
   Future<List<int>> getCoverImageData() async {
-    if (this._coverImageData == null && this.coverImage != null)
-      this._coverImageData = await _getCoverImageData(this.coverImage);
-    return this._coverImageData;
+    if (this.coverImageData == null && this.coverImage != null)
+      this.coverImageData = await _getCoverImageData(this.coverImage);
+    return this.coverImageData;
   }
 }

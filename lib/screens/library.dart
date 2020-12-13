@@ -1,4 +1,3 @@
-
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/util/context.dart';
@@ -7,7 +6,6 @@ import 'package:arcana_ebook_reader/widgets/importBooks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:isolate_handler/isolate_handler.dart';
-
 
 class Library extends StatelessWidget {
   Library();
@@ -73,6 +71,11 @@ class LibraryBodyState extends State<LibraryBody> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  Container(
+                    height: 80,
+                    width: 80,
+                    child: Image.asset('assets/images/arcana_ebook_reader_filled.png'),
+                  ),
                   Text(
                     'Arcana Ebook Reader',
                     style: TextStyle(color: Colors.white, fontSize: 20),

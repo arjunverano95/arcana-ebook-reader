@@ -43,7 +43,7 @@ dev_dependencies:
   flutter_launcher_icons: ^0.8.1
   flutter_native_splash: ^0.1.9
 
-#flutter pub run flutter_native_splash:create
+#flutter pub pub run flutter_native_splash:create
 flutter_native_splash:
   image: "assets/images/arcana_ebook_reader_filled.png"
   color: "293D50"

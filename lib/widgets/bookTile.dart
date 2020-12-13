@@ -1,11 +1,9 @@
-
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:flutter/material.dart';
 
 enum CoverSize { md, lg } //sm, xl
-
 
 class BookTile extends StatefulWidget {
   final Book book;
@@ -224,8 +222,8 @@ class _BookTileState extends State<BookTile> {
                                           ? Colors.red
                                           : CustomColors.normal,
                                       onPressed: () {
-                                        book.updateFavorite().then(
-                                            (value) => env.bookstore.getBooks());
+                                        book.updateFavorite().then((value) =>
+                                            env.bookstore.getBooks());
                                         setState(() {
                                           book.isFavorite =
                                               book.isFavorite == 1 ? 0 : 1;

@@ -1,7 +1,5 @@
 import 'bookstore.dart';
 
-
-
 BuildEnvironment get env => _env;
 BuildEnvironment _env;
 
@@ -14,8 +12,9 @@ class BuildEnvironment {
   /// Sets up the top-level [env] getter on the first call only.
   static Future<void> init() async {
     //Get env Config
-      _env ??= BuildEnvironment._init(bookstore: Bookstore(), );
-      await _env.bookstore.getBooks();
-
+    _env ??= BuildEnvironment._init(
+      bookstore: Bookstore(),
+    );
+    await _env.bookstore.getBooks();
   }
 }

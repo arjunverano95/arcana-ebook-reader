@@ -8,7 +8,6 @@ class CustomColors {
   // static Color themeDarkHighlight = Color(0xFF4a5a6b);
   // static Color themeBlueShade = Color(0xFFA1B8CE);
 
-  
   static Color background = Color(0xFFE9E9E9);
   static Color normal = Color(0xFF293D50);
 

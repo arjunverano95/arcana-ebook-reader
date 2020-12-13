@@ -1,4 +1,3 @@
-
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/util/context.dart';
@@ -6,8 +5,6 @@ import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:isolate_handler/isolate_handler.dart';
-
-
 
 class Favorites extends StatelessWidget {
   Favorites();
@@ -33,7 +30,9 @@ class FavoritesBodyState extends State<FavoritesBody> {
   }
 
   Widget _buildRows(Book book, int index) {
-    return BookTile(book: book,);
+    return BookTile(
+      book: book,
+    );
   }
 
   Widget _listBooks() {

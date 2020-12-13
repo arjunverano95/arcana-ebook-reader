@@ -6,6 +6,7 @@
     "scripts": {
       "start": "flutter run",
       "get:dependencies": "flutter pub get",
+      "format": "flutter format",
       "build:apk": "flutter build apk",
       "build:ios": "flutter build ios",
       "update:splash_screen": "flutter pub pub run flutter_native_splash:create",

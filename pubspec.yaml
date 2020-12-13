@@ -33,13 +33,22 @@ dependencies:
   isolate_handler: ^0.3.1
   mobx: ^1.2.1+4
   flutter_mobx: ^1.1.0+2
-  flutter_launcher_icons: ^0.8.1
+  permission_handler: ^5.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   build_runner: ^1.10.9
   mobx_codegen: ^1.1.2
+  flutter_launcher_icons: ^0.8.1
+  flutter_native_splash: ^0.1.9
+
+#flutter pub run flutter_native_splash:create
+flutter_native_splash:
+  image: "assets/images/arcana_ebook_reader_filled.png"
+  color: "293D50"
+  android: true
+  ios: true
 
 # flutter pub run flutter_launcher_icons:main
 flutter_icons:

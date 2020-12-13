@@ -45,7 +45,7 @@ dev_dependencies:
 
 #flutter pub pub run flutter_native_splash:create
 flutter_native_splash:
-  image: "assets/images/arcana_ebook_reader_filled.png"
+  image: "assets/images/arcana_ebook_reader_transparent.png"
   color: "293D50"
   android: true
   ios: true

@@ -74,7 +74,7 @@ class LibraryBodyState extends State<LibraryBody> {
                   Container(
                     height: 80,
                     width: 80,
-                    child: Image.asset('assets/images/arcana_ebook_reader_filled.png'),
+                    child: Image.asset('assets/images/arcana_ebook_reader_transparent.png'),
                   ),
                   Text(
                     'Arcana Ebook Reader',

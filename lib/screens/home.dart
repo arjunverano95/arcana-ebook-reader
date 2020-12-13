@@ -96,7 +96,7 @@ class HomeBodyState extends State<HomeBody> {
                   Container(
                     height: 80,
                     width: 80,
-                    child: Image.asset('assets/images/arcana_ebook_reader_filled.png'),
+                    child: Image.asset('assets/images/arcana_ebook_reader_transparent.png'),
                   ),
                   Text(
                     'Arcana Ebook Reader',
@@ -202,7 +202,7 @@ class HomeBodyState extends State<HomeBody> {
               child: Observer(builder: (_) => _recentAdded()),
             ),
             Container(
-              margin: EdgeInsets.all(15),
+              margin: EdgeInsets.only(left:15,right:15,bottom:15),
               decoration: (env.bookstore.books != null &&
                       env.bookstore.books.length > 0)
                   ? BoxDecoration(

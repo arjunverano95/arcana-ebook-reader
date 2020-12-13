@@ -1,0 +1,25 @@
+{
+  "name": "arcana_ebook_reader",
+  "version": "1.0.0",
+  "description": "A simple Ebook reader which supports the most common eBook formats including EPUB, PDF, MOBI, TXT, and many others",
+  "private": true,
+    "scripts": {
+      "start": "flutter run",
+      "get:dependencies": "flutter pub get",
+      "build:apk": "flutter build apk",
+      "build:ios": "flutter build ios",
+      "update:splash_screen": "flutter pub pub run flutter_native_splash:create",
+      "update:launcher_icons": "flutter pub run flutter_launcher_icons:main"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arjunverano95/arcana-ebook-reader.git"
+  },
+  "keywords": ["epub","pdf","mobi","text","reader","ebook"],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arjunverano95/arcana-ebook-reader/issues"
+  },
+  "homepage": "https://github.com/arjunverano95/arcana-ebook-reader#readme"
+}

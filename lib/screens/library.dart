@@ -118,7 +118,6 @@ class LibraryBodyState extends State<LibraryBody> {
       appBar: AppBar(
         centerTitle: false,
         title: Text('Library'),
-        backgroundColor: CustomColors.normal,
         actions: [
           IconButton(
             icon: Icon(Icons.sort_by_alpha, color: Colors.white),
@@ -147,6 +146,7 @@ class LibraryBodyState extends State<LibraryBody> {
         ),
       ),
       body: SingleChildScrollView(
+        padding: EdgeInsets.all(15),
         child: ConstrainedBox(
           constraints: BoxConstraints(),
           child: Column(children: [

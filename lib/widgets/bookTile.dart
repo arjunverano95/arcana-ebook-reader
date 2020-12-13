@@ -42,8 +42,8 @@ class _BookTileState extends State<BookTile> {
     return InkWell(
       onTap: () {},
       child: Container(
-        margin: EdgeInsets.only(bottom: 15, left: 15, right: 15),
         padding: EdgeInsets.all(15),
+        margin: EdgeInsets.only(bottom:15),
         color: Colors.white,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,

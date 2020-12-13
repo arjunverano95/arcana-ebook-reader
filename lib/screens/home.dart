@@ -164,18 +164,16 @@ class HomeBodyState extends State<HomeBody> {
       appBar: AppBar(
         centerTitle: false,
         title: Text('Arcana Ebook Reader'),
-        backgroundColor: CustomColors.normal,
       ),
       body: SingleChildScrollView(
+        padding: EdgeInsets.all(15),
         child: ConstrainedBox(
           constraints: BoxConstraints(),
           child: Column(children: <Widget>[
             Container(
-              padding: EdgeInsets.only(top: 15),
               child: Observer(builder: (_) => _recentRead()),
             ),
             Container(
-              margin: EdgeInsets.only(top: 15, left: 15, right: 15),
               padding: EdgeInsets.only(bottom: 5),
               decoration: BoxDecoration(
                 border: Border(
@@ -202,8 +200,7 @@ class HomeBodyState extends State<HomeBody> {
               padding: EdgeInsets.only(top: 15),
               child: Observer(builder: (_) => _recentAdded()),
             ),
-            Container(
-              margin: EdgeInsets.only(left: 15, right: 15, bottom: 15),
+            Observer(builder: (_) =>  Container(
               decoration: (env.bookstore.books != null &&
                       env.bookstore.books.length > 0)
                   ? BoxDecoration(
@@ -230,7 +227,8 @@ class HomeBodyState extends State<HomeBody> {
                 ],
               ),
             ),
-          ]),
+       ),
+              ]),
         ),
       ),
     );

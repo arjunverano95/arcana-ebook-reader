@@ -10,7 +10,7 @@ import 'package:uuid/uuid.dart';
 import 'package:epub/epub.dart' as Epub;
 import 'package:image/image.dart' as ImageObj;
 
-Future<void> openImportDialog() async {
+Future<void> showImportDialog() async {
   if (await Permission.storage.request().isGranted) {
     // final isolates = IsolateHandler();
     FilePicker.platform.pickFiles(
@@ -30,7 +30,6 @@ Future<void> openImportDialog() async {
           //     },
           //     onInitialized: () =>
           //         isolates.send(file, to: 'importBooks'));
-
           _importBooks(
                   result.files[0].path, result.files[0].extension.toLowerCase())
               .then((value) => env.bookstore.getBooks());

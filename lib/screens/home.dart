@@ -217,7 +217,7 @@ class HomeBodyState extends State<HomeBody> {
                 children: [
                   RaisedButton.icon(
                     color: CustomColors.normal,
-                    onPressed: () => {openImportDialog()},
+                    onPressed: () => {showImportDialog()},
                     icon: Icon(Icons.file_download, color: Colors.white),
                     label: Text(
                       "Import books",

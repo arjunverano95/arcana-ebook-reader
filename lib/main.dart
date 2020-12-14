@@ -1,6 +1,7 @@
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:flutter/material.dart';
+// import 'package:flutter_easyloading/flutter_easyloading.dart';
 // import 'package:flutter/services.dart';
 import 'screens/home.dart';
 
@@ -9,10 +10,14 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // SystemChrome.setEnabledSystemUIOverlays([]);
   await BuildEnvironment.init();
-  runApp(MaterialApp(
+  runApp(
+    MaterialApp(
       title: 'Arcana Ebook Reader',
       theme: ThemeData(
         primaryColor: CustomColors.normal,
       ),
-      home: Home()));
+      home: Home(),
+      // builder: EasyLoading.init(),
+    ),
+  );
 }

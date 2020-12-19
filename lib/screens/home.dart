@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:isolate_handler/isolate_handler.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Home extends StatelessWidget {
   Home();
@@ -82,11 +83,15 @@ class HomeBodyState extends State<HomeBody> {
 
   @override
   Widget build(BuildContext context) {
+    // SystemChrome.setPreferredOrientations([
+    //     DeviceOrientation.portraitUp,
+    //     DeviceOrientation.portraitDown,
+    //   ]);
     return Scaffold(
       backgroundColor: CustomColors.background,
       drawer: Drawer(
         child: ListView(
-          padding: EdgeInsets.zero,
+          padding: EdgeInsets.all(0.sp),
           children: <Widget>[
             DrawerHeader(
               child: Column(
@@ -94,14 +99,15 @@ class HomeBodyState extends State<HomeBody> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Container(
-                    height: 80,
-                    width: 80,
+                    height: 140.w,
+                    width: 140.w,
                     child: Image.asset(
-                        'assets/images/arcana_ebook_reader_transparent.png'),
+                        'assets/images/arcana_ebook_reader_transparent.png',
+                        fit: BoxFit.fitWidth),
                   ),
                   Text(
                     'Arcana Ebook Reader',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
+                    style: TextStyle(color: Colors.white, fontSize: 30.sp),
                   ),
                 ],
               ),
@@ -113,10 +119,12 @@ class HomeBodyState extends State<HomeBody> {
               leading: Icon(
                 Icons.library_books,
                 color: CustomColors.normal,
+                size: 44.sp,
               ),
               title: Text(
                 'Library',
-                style: TextStyle(color: CustomColors.textNormal, fontSize: 15),
+                style:
+                    TextStyle(color: CustomColors.textNormal, fontSize: 28.sp),
               ),
               onTap: () async {
                 Navigator.of(context).pop();
@@ -131,10 +139,12 @@ class HomeBodyState extends State<HomeBody> {
               leading: Icon(
                 Icons.favorite_border,
                 color: CustomColors.normal,
+                size: 44.sp,
               ),
               title: Text(
                 'Favorites',
-                style: TextStyle(color: CustomColors.textNormal, fontSize: 15),
+                style:
+                    TextStyle(color: CustomColors.textNormal, fontSize: 28.sp),
               ),
               onTap: () async {
                 Navigator.of(context).pop();
@@ -149,10 +159,12 @@ class HomeBodyState extends State<HomeBody> {
               leading: Icon(
                 Icons.exit_to_app,
                 color: CustomColors.normal,
+                size: 44.sp,
               ),
               title: Text(
                 'Exit',
-                style: TextStyle(color: CustomColors.textNormal, fontSize: 15),
+                style:
+                    TextStyle(color: CustomColors.textNormal, fontSize: 28.sp),
               ),
               onTap: () {
                 SystemNavigator.pop();
@@ -163,10 +175,11 @@ class HomeBodyState extends State<HomeBody> {
       ),
       appBar: AppBar(
         centerTitle: false,
-        title: Text('Arcana Ebook Reader'),
+        title: Text('Arcana Ebook Reader',
+            style: TextStyle(color: Colors.white, fontSize: 30.sp)),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(15),
+        padding: EdgeInsets.all(30.sp),
         child: ConstrainedBox(
           constraints: BoxConstraints(),
           child: Column(children: <Widget>[
@@ -174,7 +187,7 @@ class HomeBodyState extends State<HomeBody> {
               child: Observer(builder: (_) => _recentRead()),
             ),
             Container(
-              padding: EdgeInsets.only(bottom: 5),
+              padding: EdgeInsets.only(bottom: 10.sp),
               decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
@@ -190,45 +203,47 @@ class HomeBodyState extends State<HomeBody> {
                     "RECENTLY ADDED",
                     style: TextStyle(
                       color: CustomColors.textNormal,
-                      fontSize: 15,
+                      fontSize: 28.sp,
                     ),
                   )
                 ],
               ),
             ),
             Container(
-              padding: EdgeInsets.only(top: 15),
+              padding: EdgeInsets.only(top: 30.sp),
               child: Observer(builder: (_) => _recentAdded()),
             ),
-            Observer(builder: (_) =>  Container(
-              decoration: (env.bookstore.books != null &&
-                      env.bookstore.books.length > 0)
-                  ? BoxDecoration(
-                      border: Border(
-                        top: BorderSide(
-                            width: 1,
-                            color: CustomColors.normal,
-                            style: BorderStyle.solid),
+            Observer(
+              builder: (_) => Container(
+                decoration: (env.bookstore.books != null &&
+                        env.bookstore.books.length > 0)
+                    ? BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                              width: 1,
+                              color: CustomColors.normal,
+                              style: BorderStyle.solid),
+                        ),
+                      )
+                    : null,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    RaisedButton.icon(
+                      color: CustomColors.normal,
+                      onPressed: () => {showImportDialog()},
+                      icon: Icon(Icons.file_download,
+                          color: Colors.white, size: 44.sp),
+                      label: Text(
+                        "Import books",
+                        style: TextStyle(color: Colors.white, fontSize: 28.sp),
                       ),
-                    )
-                  : null,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  RaisedButton.icon(
-                    color: CustomColors.normal,
-                    onPressed: () => {showImportDialog()},
-                    icon: Icon(Icons.file_download, color: Colors.white),
-                    label: Text(
-                      "Import books",
-                      style: TextStyle(color: Colors.white, fontSize: 15),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-       ),
-              ]),
+          ]),
         ),
       ),
     );

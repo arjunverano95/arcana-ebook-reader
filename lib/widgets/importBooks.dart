@@ -9,12 +9,13 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:uuid/uuid.dart';
 import 'package:epub/epub.dart' as Epub;
 import 'package:image/image.dart' as ImageObj;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 Future<void> showImportDialog() async {
   if (await Permission.storage.request().isGranted) {
     // final isolates = IsolateHandler();
     FilePicker.platform.pickFiles(
-      allowMultiple: false,
+      allowMultiple: true,
       type: FileType.custom,
       allowedExtensions: ['epub'],
     ).then((result) async {
@@ -30,9 +31,7 @@ Future<void> showImportDialog() async {
           //     },
           //     onInitialized: () =>
           //         isolates.send(file, to: 'importBooks'));
-          _importBooks(
-                  result.files[0].path, result.files[0].extension.toLowerCase())
-              .then((value) => env.bookstore.getBooks());
+          _importBooks(result.files).then((value) => env.bookstore.getBooks());
         }
       }
     });
@@ -52,38 +51,39 @@ Future<void> showImportDialog() async {
 //   });
 // }
 
-Future<bool> _importBooks(String filePath, String fileExt) async {
-  // List<PlatformFile> files
+Future<bool> _importBooks(List<PlatformFile> files) async {
+  for (var i = 0; i < files.length; i++) {
+    PlatformFile file = files[i];
 
-  //for (var i = 0; i < files.length; i++) {
-  //PlatformFile file = files[0];
-  if (fileExt == "epub") {
-    String uKey = Uuid().v1();
-    var epubFile = File(filePath);
-    Uint8List bytes = await epubFile.readAsBytes();
+    String filePath = file.path;
+    String fileExt = file.extension.toLowerCase();
+    if (fileExt == "epub") {
+      String uKey = Uuid().v1();
+      var epubFile = File(filePath);
+      Uint8List bytes = await epubFile.readAsBytes();
 
-    Epub.EpubBookRef epubBook = await Epub.EpubReader.openBook(bytes);
+      Epub.EpubBookRef epubBook = await Epub.EpubReader.openBook(bytes);
 
-    ImageObj.Image coverImage = await epubBook.readCover();
+      ImageObj.Image coverImage = await epubBook.readCover();
 
-    List<int> imageBytes;
-    if (coverImage != null) {
-      ImageObj.Image thumbnail =
-          ImageObj.copyResize(coverImage, width: 195, height: 265);
-      imageBytes = ImageObj.encodeJpg(thumbnail);
-      if (imageBytes == null) imageBytes = ImageObj.encodePng(thumbnail);
-      //if(imageBytes == null) imageBytes = ImageObj.encodeGif(thumbnail);
+      List<int> imageBytes;
+      if (coverImage != null) {
+        ImageObj.Image thumbnail = ImageObj.copyResize(coverImage,
+            width: 390.w.toInt(), height: 530.w.toInt());
+        imageBytes = ImageObj.encodeJpg(thumbnail);
+        if (imageBytes == null) imageBytes = ImageObj.encodePng(thumbnail);
+        //if(imageBytes == null) imageBytes = ImageObj.encodeGif(thumbnail);
+      }
+
+      Book newBook = new Book();
+      newBook.id = uKey;
+      newBook.title = epubBook.Title;
+      newBook.author = epubBook.Author;
+      newBook.addedDate = DateTime.now();
+      newBook.lastRead = DateTime.now();
+      newBook.isFavorite = 0;
+      await Book.add(newBook, fileExt, bytes, imageBytes);
     }
-
-    Book newBook = new Book();
-    newBook.id = uKey;
-    newBook.title = epubBook.Title;
-    newBook.author = epubBook.Author;
-    newBook.addedDate = DateTime.now();
-    newBook.lastRead = DateTime.now();
-    newBook.isFavorite = 0;
-    await Book.add(newBook, fileExt, bytes, imageBytes);
   }
-  //}
   return true;
 }

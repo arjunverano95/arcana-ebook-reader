@@ -2,6 +2,7 @@ import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 enum CoverSize { md, lg } //sm, xl
 
@@ -27,29 +28,29 @@ class _BookTileState extends State<BookTile> {
     if (size == null) size = CoverSize.md;
 
     double coverWidth = 0;
-    double coverHeight = 0;
     double containerHeight = 0;
     if (size == CoverSize.md) {
-      coverWidth = 110.4;
-      coverHeight = 150;
-      containerHeight = 150;
+      coverWidth = 220.w;
+      containerHeight = 290.w;
     } else if (size == CoverSize.lg) {
-      coverWidth = 169;
-      coverHeight = 230;
-      containerHeight = 230;
+      coverWidth = 300.w;
+      containerHeight = 410.w;
+      // coverWidth = 169;
+      // coverHeight = 230;
+      // containerHeight = 230;
     }
 
     return InkWell(
       onTap: () {},
       child: Container(
-        padding: EdgeInsets.all(15),
-        margin: EdgeInsets.only(bottom:15),
+        padding: EdgeInsets.all(30.sp),
+        margin: EdgeInsets.only(bottom: 30.sp),
         color: Colors.white,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              height: coverHeight,
+              // height: coverHeight,
               width: coverWidth,
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -69,13 +70,15 @@ class _BookTileState extends State<BookTile> {
                       AsyncSnapshot<List<int>> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting &&
                         snapshot.hasData == false) {
-                      return Image.asset('assets/images/no_cover.jpg');
+                      return Image.asset('assets/images/no_cover.jpg',
+                          fit: BoxFit.fitWidth);
                     } else {
                       var image = snapshot.data;
                       if (image == null) {
-                        return Image.asset('assets/images/no_cover.jpg');
+                        return Image.asset('assets/images/no_cover.jpg',
+                            fit: BoxFit.fitWidth);
                       } else {
-                        return Image.memory(image);
+                        return Image.memory(image, fit: BoxFit.fitWidth);
                       }
                     }
                   },
@@ -85,7 +88,7 @@ class _BookTileState extends State<BookTile> {
             Expanded(
               child: Container(
                 height: containerHeight,
-                padding: EdgeInsets.only(left: 15),
+                padding: EdgeInsets.only(left: 30.sp),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -101,17 +104,17 @@ class _BookTileState extends State<BookTile> {
                             style: TextStyle(
                                 color: CustomColors.textDark,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 17),
+                                fontSize: 30.sp),
                           ),
                         ),
                         SizedBox(
-                          height: 25,
-                          width: 25,
+                          height: 50.w,
+                          width: 50.w,
                           child: PopupMenuButton<String>(
-                            padding: EdgeInsets.all(0),
+                            padding: EdgeInsets.all(0.sp),
                             icon: Icon(
                               Icons.more_vert,
-                              size: 22,
+                              size: 40.sp,
                             ),
                             onSelected: (String result) {
                               if (result == "Delete") {
@@ -126,7 +129,7 @@ class _BookTileState extends State<BookTile> {
                                 child: Text('Delete',
                                     style: TextStyle(
                                       color: CustomColors.textNormal,
-                                      fontSize: 15,
+                                      fontSize: 28.sp,
                                     )),
                               ),
                             ],
@@ -138,7 +141,7 @@ class _BookTileState extends State<BookTile> {
                       book.author,
                       style: TextStyle(
                         color: CustomColors.textGray,
-                        fontSize: 13,
+                        fontSize: 25.sp,
                       ),
                     ),
                     Expanded(
@@ -156,14 +159,14 @@ class _BookTileState extends State<BookTile> {
                                 "%)",
                             style: TextStyle(
                               color: CustomColors.textHighlight,
-                              fontSize: 13,
+                              fontSize: 24.sp,
                             ),
                           ),
                           Visibility(
                             visible: !infoOnly,
                             child: Container(
-                              padding: EdgeInsets.only(top: 5),
-                              margin: EdgeInsets.only(top: 5),
+                              padding: EdgeInsets.only(top: 10.sp),
+                              margin: EdgeInsets.only(top: 10.sp),
                               decoration: BoxDecoration(
                                 border: Border(
                                   top: BorderSide(
@@ -176,47 +179,47 @@ class _BookTileState extends State<BookTile> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   SizedBox(
-                                    height: 27,
-                                    width: 27,
+                                    height: 52.w,
+                                    width: 52.w,
                                     child: IconButton(
-                                      padding: EdgeInsets.all(0),
+                                      padding: EdgeInsets.all(0.sp),
                                       icon: Icon(
                                         Icons.format_list_bulleted,
-                                        size: 24,
+                                        size: 44.sp,
                                       ),
                                       color: CustomColors.normal,
                                       onPressed: () {},
                                     ),
                                   ),
                                   Container(
-                                    width: 10,
+                                    width: 20.w,
                                   ),
                                   SizedBox(
-                                    height: 27,
-                                    width: 27,
+                                    height: 52.w,
+                                    width: 52.w,
                                     child: IconButton(
-                                      padding: EdgeInsets.all(0),
+                                      padding: EdgeInsets.all(0.sp),
                                       icon: Icon(
                                         Icons.bookmark_border,
-                                        size: 24,
+                                        size: 44.sp,
                                       ),
                                       color: CustomColors.normal,
                                       onPressed: () {},
                                     ),
                                   ),
                                   Container(
-                                    width: 10,
+                                    width: 20.w,
                                   ),
                                   SizedBox(
-                                    height: 27,
-                                    width: 27,
+                                    height: 52.w,
+                                    width: 52.w,
                                     child: IconButton(
-                                      padding: EdgeInsets.all(0),
+                                      padding: EdgeInsets.all(0.sp),
                                       icon: Icon(
                                         book.isFavorite == 1
                                             ? Icons.favorite
                                             : Icons.favorite_border,
-                                        size: 24,
+                                        size: 44.sp,
                                       ),
                                       color: book.isFavorite == 1
                                           ? Colors.red

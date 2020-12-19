@@ -6,6 +6,7 @@ import 'package:arcana_ebook_reader/widgets/importBooks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:isolate_handler/isolate_handler.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Library extends StatelessWidget {
   Library();
@@ -64,7 +65,7 @@ class LibraryBodyState extends State<LibraryBody> {
       backgroundColor: CustomColors.background,
       endDrawer: Drawer(
         child: ListView(
-          padding: EdgeInsets.zero,
+          padding: EdgeInsets.all(0.sp),
           children: <Widget>[
             DrawerHeader(
               child: Column(
@@ -72,14 +73,15 @@ class LibraryBodyState extends State<LibraryBody> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Container(
-                    height: 80,
-                    width: 80,
+                    height: 140.w,
+                    width: 140.w,
                     child: Image.asset(
-                        'assets/images/arcana_ebook_reader_transparent.png'),
+                        'assets/images/arcana_ebook_reader_transparent.png',
+                        fit: BoxFit.fitWidth),
                   ),
                   Text(
                     'Arcana Ebook Reader',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
+                    style: TextStyle(color: Colors.white, fontSize: 30.sp),
                   ),
                 ],
               ),
@@ -91,10 +93,12 @@ class LibraryBodyState extends State<LibraryBody> {
               leading: Icon(
                 Icons.file_download,
                 color: CustomColors.normal,
+                size: 44.sp,
               ),
               title: Text(
                 'Import books',
-                style: TextStyle(color: CustomColors.textNormal, fontSize: 15),
+                style:
+                    TextStyle(color: CustomColors.textNormal, fontSize: 28.sp),
               ),
               onTap: () {
                 Navigator.of(context).pop();
@@ -108,7 +112,7 @@ class LibraryBodyState extends State<LibraryBody> {
             //   ),
             //   title: Text(
             //     'Scan books in directory',
-            //     style: TextStyle(color: CustomColors.textNormal, fontSize: 15),
+            //     style: TextStyle(color: CustomColors.textNormal, fontSize: 28.sp),
             //   ),
             //   onTap: () {},
             // ),
@@ -117,10 +121,11 @@ class LibraryBodyState extends State<LibraryBody> {
       ),
       appBar: AppBar(
         centerTitle: false,
-        title: Text('Library'),
+        title: Text('Library',
+            style: TextStyle(color: Colors.white, fontSize: 30.sp)),
         actions: [
           IconButton(
-            icon: Icon(Icons.sort_by_alpha, color: Colors.white),
+            icon: Icon(Icons.sort_by_alpha, color: Colors.white, size: 44.sp),
             onPressed: () {
               setState(() {
                 _sort = (_sort == "asc" ? "desc" : "asc");
@@ -128,25 +133,25 @@ class LibraryBodyState extends State<LibraryBody> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.search, color: Colors.white),
+            icon: Icon(Icons.search, color: Colors.white, size: 44.sp),
             onPressed: () {},
           ),
           IconButton(
-            icon: Icon(Icons.menu, color: Colors.white),
+            icon: Icon(Icons.menu, color: Colors.white, size: 44.sp),
             onPressed: () {
               _key.currentState.openEndDrawer();
             },
           )
         ],
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white, size: 44.sp),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(15),
+        padding: EdgeInsets.all(30.sp),
         child: ConstrainedBox(
           constraints: BoxConstraints(),
           child: Column(children: [

@@ -5,6 +5,7 @@ import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:isolate_handler/isolate_handler.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Favorites extends StatelessWidget {
   Favorites();
@@ -64,10 +65,11 @@ class FavoritesBodyState extends State<FavoritesBody> {
       backgroundColor: CustomColors.background,
       appBar: AppBar(
         centerTitle: false,
-        title: Text('Favorites'),
+        title: Text('Favorites',
+            style: TextStyle(color: Colors.white, fontSize: 30.sp)),
         actions: [
           IconButton(
-            icon: Icon(Icons.sort_by_alpha, color: Colors.white),
+            icon: Icon(Icons.sort_by_alpha, color: Colors.white, size: 44.sp),
             onPressed: () {
               setState(() {
                 _sort = (_sort == "asc" ? "desc" : "asc");
@@ -75,19 +77,19 @@ class FavoritesBodyState extends State<FavoritesBody> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.search, color: Colors.white),
+            icon: Icon(Icons.search, color: Colors.white, size: 44.sp),
             onPressed: () {},
           ),
         ],
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white, size: 44.sp),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(15),
+        padding: EdgeInsets.all(30.sp),
         child: ConstrainedBox(
           constraints: BoxConstraints(),
           child: Column(children: [

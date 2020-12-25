@@ -67,24 +67,18 @@ class FavoritesBodyState extends State<FavoritesBody> {
             style: TextStyle(color: Colors.white, fontSize: 30.sp)),
         actions: [
           IconButton(
-            icon: Icon(Icons.sort_by_alpha, color: Colors.white, size: 44.sp),
-            onPressed: () {
-              setState(() {
-                _sort = (_sort == "asc" ? "desc" : "asc");
-              });
-            },
-          ),
+              icon: Icon(Icons.sort_by_alpha, color: Colors.white, size: 44.sp),
+              onPressed: () => setState(() {
+                    _sort = (_sort == "asc" ? "desc" : "asc");
+                  })),
           IconButton(
             icon: Icon(Icons.search, color: Colors.white, size: 44.sp),
             onPressed: () {},
           ),
         ],
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white, size: 44.sp),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
+            icon: Icon(Icons.arrow_back, color: Colors.white, size: 44.sp),
+            onPressed: () => Navigator.of(context).pop()),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(30.sp),

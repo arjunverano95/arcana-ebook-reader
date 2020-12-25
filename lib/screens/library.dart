@@ -3,6 +3,7 @@ import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:arcana_ebook_reader/widgets/importBooks.dart';
+import 'package:arcana_ebook_reader/widgets/loading_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -58,6 +59,7 @@ class LibraryBodyState extends State<LibraryBody> {
 
   @override
   Widget build(BuildContext context) {
+    final overlay = LoadingOverlay.of(context);
     return Scaffold(
       key: _key,
       backgroundColor: CustomColors.background,
@@ -100,7 +102,7 @@ class LibraryBodyState extends State<LibraryBody> {
               ),
               onTap: () {
                 Navigator.of(context).pop();
-                showImportDialog();
+                overlay.during(showImportDialog());
               },
             ),
             // ListTile(
@@ -123,30 +125,21 @@ class LibraryBodyState extends State<LibraryBody> {
             style: TextStyle(color: Colors.white, fontSize: 30.sp)),
         actions: [
           IconButton(
-            icon: Icon(Icons.sort_by_alpha, color: Colors.white, size: 44.sp),
-            onPressed: () {
-              setState(() {
-                _sort = (_sort == "asc" ? "desc" : "asc");
-              });
-            },
-          ),
+              icon: Icon(Icons.sort_by_alpha, color: Colors.white, size: 44.sp),
+              onPressed: () => setState(() {
+                    _sort = (_sort == "asc" ? "desc" : "asc");
+                  })),
           IconButton(
             icon: Icon(Icons.search, color: Colors.white, size: 44.sp),
             onPressed: () {},
           ),
           IconButton(
-            icon: Icon(Icons.menu, color: Colors.white, size: 44.sp),
-            onPressed: () {
-              _key.currentState.openEndDrawer();
-            },
-          )
+              icon: Icon(Icons.menu, color: Colors.white, size: 44.sp),
+              onPressed: () => _key.currentState.openEndDrawer())
         ],
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white, size: 44.sp),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
+            icon: Icon(Icons.arrow_back, color: Colors.white, size: 44.sp),
+            onPressed: () => Navigator.of(context).pop()),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(30.sp),

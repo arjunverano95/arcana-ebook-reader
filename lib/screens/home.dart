@@ -152,20 +152,17 @@ class HomeBodyState extends State<HomeBody> {
               },
             ),
             ListTile(
-              leading: Icon(
-                Icons.exit_to_app,
-                color: CustomColors.normal,
-                size: 44.sp,
-              ),
-              title: Text(
-                'Exit',
-                style:
-                    TextStyle(color: CustomColors.textNormal, fontSize: 28.sp),
-              ),
-              onTap: () {
-                SystemNavigator.pop();
-              },
-            ),
+                leading: Icon(
+                  Icons.exit_to_app,
+                  color: CustomColors.normal,
+                  size: 44.sp,
+                ),
+                title: Text(
+                  'Exit',
+                  style: TextStyle(
+                      color: CustomColors.textNormal, fontSize: 28.sp),
+                ),
+                onTap: () => SystemNavigator.pop()),
           ],
         ),
       ),
@@ -227,7 +224,7 @@ class HomeBodyState extends State<HomeBody> {
                   children: [
                     RaisedButton.icon(
                       color: CustomColors.normal,
-                      onPressed: () => {overlay.during(showImportDialog())},
+                      onPressed: () => overlay.during(showImportDialog()),
                       icon: Icon(Icons.file_download,
                           color: Colors.white, size: 44.sp),
                       label: Text(

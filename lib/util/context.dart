@@ -16,6 +16,7 @@ class Book {
   DateTime addedDate;
   int isFavorite;
   String fileName;
+  String fileType;
   String coverImage;
   List<int> coverImageData;
 
@@ -30,6 +31,7 @@ class Book {
         addedDate = null,
         isFavorite = 0,
         fileName = "",
+        fileType = "",
         coverImage = "";
   //coverImageData = null;
 
@@ -44,6 +46,7 @@ class Book {
         addedDate = DateTime.tryParse(json['addedDate'] ?? ""),
         isFavorite = json['isFavorite'],
         fileName = json['fileName'],
+        fileType = json['fileType'],
         coverImage = json['coverImage'];
 
   Map<String, dynamic> toJson() => {
@@ -61,6 +64,7 @@ class Book {
             : "",
         "isFavorite": isFavorite,
         "fileName": fileName,
+        "fileType": fileType,
         "coverImage": coverImage
       };
   static Future<String> _addToDir(String filename, List<int> data) async {
@@ -112,6 +116,7 @@ class Book {
       }
 
       newBook.fileName = fileName;
+      newBook.fileType = fileExtension;
       newBook.coverImage = coverImage;
       books.add(newBook);
       var jsonString = jsonEncode(books.map((e) => e.toJson()).toList());
@@ -227,33 +232,16 @@ class Book {
     }
   }
 
-  static Future<String> getJson() async {
-    try {
-      //check libray on AppData
-      final appDirectory = await getApplicationDocumentsDirectory();
-      final appDirectoryPath = appDirectory.path;
-      final configPath = '$appDirectoryPath/library.json';
-      final configFile = File(configPath);
-      final exists = await configFile.exists();
-      //if not exist copy template from asset
-      if (!exists) {
-        await configFile.create();
-        String jsonString =
-            await rootBundle.loadString('assets/data/library.json');
-        await configFile.writeAsString(jsonString);
-      }
-      // Read the libray.
-      String jsonString = await configFile.readAsString();
-
-      return jsonString;
-    } catch (ex) {
-      return null;
-    }
-  }
-
   Future<List<int>> getCoverImageData() async {
     if (this.coverImageData == null && this.coverImage != null)
       this.coverImageData = await _getCoverImageData(this.coverImage);
     return this.coverImageData;
+  }
+
+  Future<String> getPath() async {
+    final appDirectory = await getApplicationDocumentsDirectory();
+    final appDirectoryPath = appDirectory.path;
+    final bookPath = '$appDirectoryPath/${this.fileName}';
+    return bookPath;
   }
 }

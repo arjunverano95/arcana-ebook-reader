@@ -89,7 +89,7 @@ Future<bool> _importBooks(List<PlatformFile> files) async {
       newBook.title = epubBook.Title;
       newBook.author = epubBook.Author;
       newBook.addedDate = DateTime.now();
-      newBook.lastRead = DateTime.now();
+      // newBook.lastRead = DateTime.now();
       newBook.isFavorite = 0;
       await Book.add(newBook, fileExt, bytes, imageBytes);
     }

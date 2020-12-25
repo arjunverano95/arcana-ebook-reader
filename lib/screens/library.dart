@@ -5,7 +5,6 @@ import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:arcana_ebook_reader/widgets/importBooks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:isolate_handler/isolate_handler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Library extends StatelessWidget {
@@ -26,7 +25,6 @@ class LibraryBodyState extends State<LibraryBody> {
   LibraryBodyState();
   final GlobalKey<ScaffoldState> _key = GlobalKey();
   String _sort = "asc";
-  final isolates = IsolateHandler();
   @override
   void initState() {
     super.initState();

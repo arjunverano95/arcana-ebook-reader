@@ -4,7 +4,6 @@ import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:isolate_handler/isolate_handler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Favorites extends StatelessWidget {
@@ -24,7 +23,6 @@ class FavoritesBody extends StatefulWidget {
 class FavoritesBodyState extends State<FavoritesBody> {
   FavoritesBodyState();
   String _sort = "asc";
-  final isolates = IsolateHandler();
   @override
   void initState() {
     super.initState();

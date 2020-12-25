@@ -9,7 +9,6 @@ import 'package:arcana_ebook_reader/widgets/loading_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:isolate_handler/isolate_handler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Home extends StatelessWidget {
@@ -29,7 +28,6 @@ class HomeBody extends StatefulWidget {
 
 class HomeBodyState extends State<HomeBody> {
   HomeBodyState();
-  final isolates = IsolateHandler();
   @override
   void initState() {
     super.initState();

@@ -5,6 +5,7 @@ import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:arcana_ebook_reader/widgets/importBooks.dart';
+import 'package:arcana_ebook_reader/widgets/loading_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -83,10 +84,7 @@ class HomeBodyState extends State<HomeBody> {
 
   @override
   Widget build(BuildContext context) {
-    // SystemChrome.setPreferredOrientations([
-    //     DeviceOrientation.portraitUp,
-    //     DeviceOrientation.portraitDown,
-    //   ]);
+    final overlay = LoadingOverlay.of(context);
     return Scaffold(
       backgroundColor: CustomColors.background,
       drawer: Drawer(
@@ -231,7 +229,7 @@ class HomeBodyState extends State<HomeBody> {
                   children: [
                     RaisedButton.icon(
                       color: CustomColors.normal,
-                      onPressed: () => {showImportDialog()},
+                      onPressed: () => {overlay.during(showImportDialog())},
                       icon: Icon(Icons.file_download,
                           color: Colors.white, size: 44.sp),
                       label: Text(

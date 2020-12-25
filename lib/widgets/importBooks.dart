@@ -5,36 +5,40 @@ import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-// import 'package:isolate_handler/isolate_handler.dart';
 import 'package:uuid/uuid.dart';
 import 'package:epub/epub.dart' as Epub;
 import 'package:image/image.dart' as ImageObj;
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 Future<void> showImportDialog() async {
   if (await Permission.storage.request().isGranted) {
     // final isolates = IsolateHandler();
-    FilePicker.platform.pickFiles(
+    var result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.custom,
       allowedExtensions: ['epub'],
-    ).then((result) async {
-      if (result != null) {
-        if (result.files.length > 0) {
-          // SINGLE FILE ONLY
+    );
 
-          // String file = result.files[0].path  + "|"+  result.files[0].extension.toLowerCase();
-          // isolates.spawn<bool>(importBooks,
-          //     name: 'importBooks',
-          //     onReceive: (value) {
-          //       isolates.kill('importBooks');
-          //     },
-          //     onInitialized: () =>
-          //         isolates.send(file, to: 'importBooks'));
-          _importBooks(result.files).then((value) => env.bookstore.getBooks());
-        }
+    if (result != null) {
+      if (result.files.length > 0) {
+        // String file = jsonEncode(result.files
+        //     .map((e) => {
+        //           "path": e.path,
+        //           "extension": e.extension,
+        //         })
+        //     .toList());
+
+        // isolates.spawn<bool>(importBooks,
+        //     name: 'importBooks',
+        //     onReceive: (value) {
+        //       isolates.kill('importBooks');
+        //       env.bookstore.getBooks();
+        //     },
+        //     onInitialized: () => isolates.send(file, to: 'importBooks'));
+        // await compute(_importBooks, result.files);
+        await _importBooks(result.files);
+        env.bookstore.getBooks();
       }
-    });
+    }
   }
 }
 
@@ -42,11 +46,14 @@ Future<void> showImportDialog() async {
 // void importBooks(Map<String, dynamic> context) {
 //   final messenger = HandledIsolate.initialize(context);
 
-//   messenger.listen((file) async {
-//     List<String> fileObj = file.toString().split("|");
-//     String filePath = fileObj[0];
-//     String fileExt = fileObj[1];
-//     bool value = await _importBooks(filePath,fileExt);
+//   messenger.listen((message) async {
+//     var files = (json.decode(message) as List)
+//         .map((e) => {
+//               "path": e.path.toString(),
+//               "extension": e.extension.toString(),
+//             })
+//         .toList();
+//     bool value = await _importBooks(files);
 //     messenger.send(value);
 //   });
 // }
@@ -68,8 +75,10 @@ Future<bool> _importBooks(List<PlatformFile> files) async {
 
       List<int> imageBytes;
       if (coverImage != null) {
-        ImageObj.Image thumbnail = ImageObj.copyResize(coverImage,
-            width: 390.w.toInt(), height: 530.w.toInt());
+        // ImageObj.Image thumbnail = ImageObj.copyResize(coverImage,
+        //     width: 390.w.toInt(), height: 530.w.toInt());
+        ImageObj.Image thumbnail =
+            ImageObj.copyResize(coverImage, width: 195, height: 265);
         imageBytes = ImageObj.encodeJpg(thumbnail);
         if (imageBytes == null) imageBytes = ImageObj.encodePng(thumbnail);
         //if(imageBytes == null) imageBytes = ImageObj.encodeGif(thumbnail);

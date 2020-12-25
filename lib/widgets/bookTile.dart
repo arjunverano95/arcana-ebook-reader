@@ -1,6 +1,7 @@
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
+import 'package:arcana_ebook_reader/widgets/ebookReader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -41,7 +42,7 @@ class _BookTileState extends State<BookTile> {
     }
 
     return InkWell(
-      onTap: () {},
+      onTap: () => readEbook(book),
       child: Container(
         padding: EdgeInsets.all(30.sp),
         margin: EdgeInsets.only(bottom: 30.sp),

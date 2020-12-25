@@ -49,6 +49,7 @@ class _FullScreenLoader extends StatelessWidget {
           child: Text(
             "Please wait ...",
             style: TextStyle(
+              decoration: TextDecoration.none,
               color: CustomColors.textNormal,
               fontSize: 18.sp,
             ),

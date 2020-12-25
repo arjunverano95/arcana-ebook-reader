@@ -67,6 +67,7 @@ class Book {
         "fileType": fileType,
         "coverImage": coverImage
       };
+
   static Future<String> _addToDir(String filename, List<int> data) async {
     //check book on AppData
     final appDirectory = await getApplicationDocumentsDirectory();
@@ -90,6 +91,35 @@ class Book {
     if (exists) {
       await bookFile.delete();
     }
+  }
+
+  static Future<List<int>> _getCoverImageData(String coverImage) async {
+    try {
+      //get cover
+      if (coverImage == "") return null;
+
+      final appDirectory = await getApplicationDocumentsDirectory();
+      final appDirectoryPath = appDirectory.path;
+      final imagePath = '$appDirectoryPath/$coverImage';
+      final imageFile = File(imagePath);
+
+      // var coverImageData = base64Decode(coverImage);
+      var image = await imageFile.readAsBytes();
+      return image;
+    } catch (ex) {
+      return null;
+    }
+  }
+
+  static Future<void> _updateLibrary(List<Book> books) async {
+    var jsonString = jsonEncode(books.map((e) => e.toJson()).toList());
+
+    //check library on AppData
+    final appDirectory = await getApplicationDocumentsDirectory();
+    final appDirectoryPath = appDirectory.path;
+    final configPath = '$appDirectoryPath/library.json';
+    final libraryFile = File(configPath);
+    await libraryFile.writeAsString(jsonString);
   }
 
   static Future<bool> add(Book newBook, String fileExtension, List<int> data,
@@ -119,14 +149,8 @@ class Book {
       newBook.fileType = fileExtension;
       newBook.coverImage = coverImage;
       books.add(newBook);
-      var jsonString = jsonEncode(books.map((e) => e.toJson()).toList());
 
-      //check library on AppData
-      final appDirectory = await getApplicationDocumentsDirectory();
-      final appDirectoryPath = appDirectory.path;
-      final configPath = '$appDirectoryPath/library.json';
-      final configFile = File(configPath);
-      await configFile.writeAsString(jsonString);
+      await Book._updateLibrary(books);
 
       return true;
     } catch (ex) {
@@ -144,18 +168,43 @@ class Book {
       await Book._deleteToDir(bookToDelete.fileName);
       await Book._deleteToDir(bookToDelete.coverImage);
       books.removeWhere((element) => element.id == id);
-      var jsonString = jsonEncode(books.map((e) => e.toJson()).toList());
 
-      //check library on AppData
-      final appDirectory = await getApplicationDocumentsDirectory();
-      final appDirectoryPath = appDirectory.path;
-      final configPath = '$appDirectoryPath/library.json';
-      final configFile = File(configPath);
-      await configFile.writeAsString(jsonString);
+      await Book._updateLibrary(books);
 
       return true;
     } catch (ex) {
       return false;
+    }
+  }
+
+  static Future<List<Book>> get() async {
+    try {
+      //check libray on AppData
+      final appDirectory = await getApplicationDocumentsDirectory();
+      final appDirectoryPath = appDirectory.path;
+      final configPath = '$appDirectoryPath/library.json';
+      final libraryFile = File(configPath);
+      final exists = await libraryFile.exists();
+      //if not exist copy template from asset
+      if (!exists) {
+        await libraryFile.create();
+        String jsonString =
+            await rootBundle.loadString('assets/data/library.json');
+        await libraryFile.writeAsString(jsonString);
+      }
+      // Read the libray.
+      String jsonString = await libraryFile.readAsString();
+
+      var library = (json.decode(jsonString) as List)
+          .map((i) => Book.fromJson(i))
+          .toList();
+
+      // for (var i = 0; i < library.length; i++) {
+      //   library[i].coverImageData =await Book._getCoverImageData(library[i].coverImage);
+      // }
+      return library;
+    } catch (ex) {
+      return null;
     }
   }
 
@@ -168,14 +217,8 @@ class Book {
       //update book
       bookToUpdate.isFavorite = bookToUpdate.isFavorite == 1 ? 0 : 1;
       books[books.indexWhere((element) => element.id == id)] = bookToUpdate;
-      var jsonString = jsonEncode(books.map((e) => e.toJson()).toList());
 
-      //check library on AppData
-      final appDirectory = await getApplicationDocumentsDirectory();
-      final appDirectoryPath = appDirectory.path;
-      final configPath = '$appDirectoryPath/library.json';
-      final configFile = File(configPath);
-      await configFile.writeAsString(jsonString);
+      await Book._updateLibrary(books);
 
       return true;
     } catch (ex) {
@@ -183,52 +226,21 @@ class Book {
     }
   }
 
-  static Future<List<int>> _getCoverImageData(String coverImage) async {
+  Future<bool> updateLastRead() async {
     try {
-      //get cover
-      if (coverImage == "") return null;
+      //get all books
+      List<Book> books = await Book.get();
+      Book bookToUpdate = books.singleWhere((element) => element.id == id);
 
-      final appDirectory = await getApplicationDocumentsDirectory();
-      final appDirectoryPath = appDirectory.path;
-      final imagePath = '$appDirectoryPath/$coverImage';
-      final imageFile = File(imagePath);
+      //update book
+      bookToUpdate.lastRead = DateTime.now();
+      books[books.indexWhere((element) => element.id == id)] = bookToUpdate;
 
-      // var coverImageData = base64Decode(coverImage);
-      var image = await imageFile.readAsBytes();
-      return image;
+      await Book._updateLibrary(books);
+
+      return true;
     } catch (ex) {
-      return null;
-    }
-  }
-
-  static Future<List<Book>> get() async {
-    try {
-      //check libray on AppData
-      final appDirectory = await getApplicationDocumentsDirectory();
-      final appDirectoryPath = appDirectory.path;
-      final configPath = '$appDirectoryPath/library.json';
-      final configFile = File(configPath);
-      final exists = await configFile.exists();
-      //if not exist copy template from asset
-      if (!exists) {
-        await configFile.create();
-        String jsonString =
-            await rootBundle.loadString('assets/data/library.json');
-        await configFile.writeAsString(jsonString);
-      }
-      // Read the libray.
-      String jsonString = await configFile.readAsString();
-
-      var library = (json.decode(jsonString) as List)
-          .map((i) => Book.fromJson(i))
-          .toList();
-
-      // for (var i = 0; i < library.length; i++) {
-      //   library[i].coverImageData =await Book._getCoverImageData(library[i].coverImage);
-      // }
-      return library;
-    } catch (ex) {
-      return null;
+      return false;
     }
   }
 

@@ -18,6 +18,7 @@ class Book {
   String fileName;
   String fileType;
   String coverImage;
+  String lastReadLocator;
   List<int> coverImageData;
 
   Book()
@@ -32,7 +33,8 @@ class Book {
         isFavorite = 0,
         fileName = "",
         fileType = "",
-        coverImage = "";
+        coverImage = "",
+        lastReadLocator = "";
   //coverImageData = null;
 
   Book.fromJson(Map<String, dynamic> json)
@@ -47,6 +49,7 @@ class Book {
         isFavorite = json['isFavorite'],
         fileName = json['fileName'],
         fileType = json['fileType'],
+        lastReadLocator = json['lastReadLocator'],
         coverImage = json['coverImage'];
 
   Map<String, dynamic> toJson() => {
@@ -65,6 +68,7 @@ class Book {
         "isFavorite": isFavorite,
         "fileName": fileName,
         "fileType": fileType,
+        "lastReadLocator": lastReadLocator,
         "coverImage": coverImage
       };
 
@@ -234,6 +238,24 @@ class Book {
 
       //update book
       bookToUpdate.lastRead = DateTime.now();
+      books[books.indexWhere((element) => element.id == id)] = bookToUpdate;
+
+      await Book._updateLibrary(books);
+
+      return true;
+    } catch (ex) {
+      return false;
+    }
+  }
+ 
+ Future<bool> updateLastReadLocator(String locator) async {
+    try {
+      //get all books
+      List<Book> books = await Book.get();
+      Book bookToUpdate = books.singleWhere((element) => element.id == id);
+
+      //update book
+      bookToUpdate.lastReadLocator = locator;
       books[books.indexWhere((element) => element.id == id)] = bookToUpdate;
 
       await Book._updateLibrary(books);

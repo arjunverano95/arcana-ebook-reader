@@ -9,6 +9,8 @@ import 'package:uuid/uuid.dart';
 import 'package:epub/epub.dart' as Epub;
 import 'package:image/image.dart' as ImageObj;
 
+import 'ebookReader.dart';
+
 Future<void> showImportDialog() async {
   if (await Permission.storage.request().isGranted) {
     // final isolates = IsolateHandler();
@@ -35,8 +37,9 @@ Future<void> showImportDialog() async {
         //     },
         //     onInitialized: () => isolates.send(file, to: 'importBooks'));
         // await compute(_importBooks, result.files);
-        await _importBooks(result.files);
+        var books = await _importBooks(result.files);
         env.bookstore.getBooks();
+        if (books.length == 1) readEbook(books[0]);
       }
     }
   }
@@ -58,7 +61,8 @@ Future<void> showImportDialog() async {
 //   });
 // }
 
-Future<bool> _importBooks(List<PlatformFile> files) async {
+Future<List<Book>> _importBooks(List<PlatformFile> files) async {
+  List<Book> res = new List<Book>();
   for (var i = 0; i < files.length; i++) {
     PlatformFile file = files[i];
 
@@ -92,7 +96,8 @@ Future<bool> _importBooks(List<PlatformFile> files) async {
       // newBook.lastRead = DateTime.now();
       newBook.isFavorite = 0;
       await Book.add(newBook, fileExt, bytes, imageBytes);
+      res.add(newBook);
     }
   }
-  return true;
+  return res;
 }

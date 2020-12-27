@@ -247,8 +247,8 @@ class Book {
       return false;
     }
   }
- 
- Future<bool> updateLastReadLocator(String locator) async {
+
+  Future<bool> updateLastReadLocator(String locator) async {
     try {
       //get all books
       List<Book> books = await Book.get();

@@ -3,13 +3,12 @@ import 'dart:typed_data';
 
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/context.dart';
+import 'package:arcana_ebook_reader/widgets/ebookReader.dart';
+import 'package:epub/epub.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:uuid/uuid.dart';
-import 'package:epub/epub.dart' as Epub;
 import 'package:image/image.dart' as ImageObj;
-
-import 'ebookReader.dart';
 
 Future<void> showImportDialog() async {
   if (await Permission.storage.request().isGranted) {
@@ -73,7 +72,7 @@ Future<List<Book>> _importBooks(List<PlatformFile> files) async {
       var epubFile = File(filePath);
       Uint8List bytes = await epubFile.readAsBytes();
 
-      Epub.EpubBookRef epubBook = await Epub.EpubReader.openBook(bytes);
+      EpubBookRef epubBook = await EpubReader.openBook(bytes);
 
       ImageObj.Image coverImage = await epubBook.readCover();
 
@@ -85,7 +84,7 @@ Future<List<Book>> _importBooks(List<PlatformFile> files) async {
             ImageObj.copyResize(coverImage, width: 195, height: 265);
         imageBytes = ImageObj.encodeJpg(thumbnail);
         if (imageBytes == null) imageBytes = ImageObj.encodePng(thumbnail);
-        //if(imageBytes == null) imageBytes = ImageObj.encodeGif(thumbnail);
+        // if (imageBytes == null) imageBytes = ImageObj.encodeTga(thumbnail);
       }
 
       Book newBook = new Book();

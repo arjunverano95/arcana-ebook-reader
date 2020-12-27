@@ -25,17 +25,24 @@ Future<void> _epubViewer(Book book) async {
 
   EpubViewer.open(
     path,
-    lastLocation: 
-    
-    book.lastReadLocator == null || book.lastReadLocator == ""
+    lastLocation: book.lastReadLocator == null || book.lastReadLocator == ""
         ? null
         : EpubLocator.fromJson(
             jsonDecode(book.lastReadLocator),
           ),
+    //  EpubLocator.fromJson({
+    //   "bookId": "urn:uuid:f2e09c5f-8c99-4ad9-b8fa-1994040befa8",
+    //   "href": "/OEBPS/Text/Chapter1.xhtml",
+    //   "created": 1609063079093,
+    //   "locations": {"cfi": "epubcfi(/0!/4/2/1:0)"},
+    //   "title": ""
+    // }),
   );
 
   EpubViewer.locatorStream.listen((locator) {
-   book.updateLastReadLocator(locator).then((value) => env.bookstore.getBooks());
+    book
+        .updateLastReadLocator(locator)
+        .then((value) => env.bookstore.getBooks());
     // print('LOCATOR: ${EpubLocator.fromJson(jsonDecode(locator))}');
   });
 }

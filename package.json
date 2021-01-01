@@ -10,7 +10,8 @@
       "build:apk": "flutter build apk",
       "build:ios": "flutter build ios",
       "update:splash_screen": "flutter pub pub run flutter_native_splash:create",
-      "update:launcher_icons": "flutter pub run flutter_launcher_icons:main"
+      "update:launcher_icons": "flutter pub run flutter_launcher_icons:main",
+      "update:stores": "flutter packages pub run build_runner build --delete-conflicting-outputs"
   },
   "repository": {
     "type": "git",

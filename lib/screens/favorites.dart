@@ -78,7 +78,7 @@ class FavoritesBodyState extends State<FavoritesBody> {
         ],
         leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white, size: 44.sp),
-            onPressed: () => Navigator.of(context).pop()),
+            onPressed: () => env.navigation.pop()),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(30.sp),

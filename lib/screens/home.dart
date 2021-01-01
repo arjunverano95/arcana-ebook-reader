@@ -1,6 +1,4 @@
 import 'package:arcana_ebook_reader/env.dart';
-import 'package:arcana_ebook_reader/screens/favorites.dart';
-import 'package:arcana_ebook_reader/screens/library.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:arcana_ebook_reader/widgets/bookTile.dart';
@@ -123,12 +121,7 @@ class HomeBodyState extends State<HomeBody> {
                     TextStyle(color: CustomColors.textNormal, fontSize: 28.sp),
               ),
               onTap: () async {
-                Navigator.of(context).pop();
-                await Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (context) => new Library(),
-                  ),
-                );
+                env.navigation.popAndNavigate('library');
               },
             ),
             ListTile(
@@ -143,12 +136,7 @@ class HomeBodyState extends State<HomeBody> {
                     TextStyle(color: CustomColors.textNormal, fontSize: 28.sp),
               ),
               onTap: () async {
-                Navigator.of(context).pop();
-                await Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (context) => new Favorites(),
-                  ),
-                );
+                env.navigation.popAndNavigate('favorites');
               },
             ),
             ListTile(

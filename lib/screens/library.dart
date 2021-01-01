@@ -101,7 +101,7 @@ class LibraryBodyState extends State<LibraryBody> {
                     TextStyle(color: CustomColors.textNormal, fontSize: 28.sp),
               ),
               onTap: () {
-                Navigator.of(context).pop();
+                env.navigation.pop();
                 overlay.during(showImportDialog());
               },
             ),
@@ -139,7 +139,7 @@ class LibraryBodyState extends State<LibraryBody> {
         ],
         leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white, size: 44.sp),
-            onPressed: () => Navigator.of(context).pop()),
+            onPressed: () => env.navigation.pop()),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(30.sp),

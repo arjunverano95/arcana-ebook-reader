@@ -61,7 +61,7 @@ Future<void> showImportDialog() async {
 // }
 
 Future<List<Book>> _importBooks(List<PlatformFile> files) async {
-  List<Book> res = new List<Book>();
+  List<Book> res = List<Book>();
   for (var i = 0; i < files.length; i++) {
     PlatformFile file = files[i];
 
@@ -87,7 +87,7 @@ Future<List<Book>> _importBooks(List<PlatformFile> files) async {
         // if (imageBytes == null) imageBytes = ImageObj.encodeTga(thumbnail);
       }
 
-      Book newBook = new Book();
+      Book newBook = Book();
       newBook.id = uKey;
       newBook.title = epubBook.Title;
       newBook.author = epubBook.Author;

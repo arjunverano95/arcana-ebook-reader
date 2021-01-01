@@ -2,6 +2,7 @@ import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+// TODO This need furthur improvements
 class LoadingOverlay {
   BuildContext _context;
 

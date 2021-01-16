@@ -66,6 +66,7 @@ Future<List<Book>> _importBooks(List<PlatformFile> files) async {
     PlatformFile file = files[i];
 
     String filePath = file.path;
+    int fileSize = file.size;
     String fileExt = file.extension.toLowerCase();
     if (fileExt == "epub") {
       String uKey = Uuid().v1();
@@ -94,7 +95,7 @@ Future<List<Book>> _importBooks(List<PlatformFile> files) async {
       newBook.addedDate = DateTime.now();
       // newBook.lastRead = DateTime.now();
       newBook.isFavorite = 0;
-      await Book.add(newBook, fileExt, bytes, imageBytes);
+      await Book.add(newBook, fileExt, fileSize, bytes, imageBytes);
       res.add(newBook);
     }
   }

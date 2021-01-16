@@ -151,13 +151,10 @@ class _BookTileState extends State<BookTile> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            "Page " +
-                                book.progressPage.toString() +
-                                " of " +
-                                book.pagelength.toString() +
-                                " (" +
-                                book.progressPercent.toString() +
-                                "%)",
+                            book.fileType.toUpperCase() +
+                                ", " +
+                                ((book.fileSize / 1000)).toStringAsFixed(1) +
+                                "MB",
                             style: TextStyle(
                               color: CustomColors.textHighlight,
                               fontSize: 24.sp,

@@ -9,14 +9,15 @@ class Book {
   String id;
   String title;
   String author;
-  int pagelength;
-  int progressPage;
-  int progressPercent;
+  // int pagelength;
+  // int progressPage;
+  // int progressPercent;
   DateTime lastRead;
   DateTime addedDate;
   int isFavorite;
   String fileName;
   String fileType;
+  int fileSize;
   String coverImage;
   String lastReadLocator;
   List<int> coverImageData;
@@ -25,14 +26,15 @@ class Book {
       : id = "",
         title = "",
         author = "",
-        pagelength = 0,
-        progressPage = 0,
-        progressPercent = 0,
+        // pagelength = 0,
+        // progressPage = 0,
+        // progressPercent = 0,
         lastRead = null,
         addedDate = null,
         isFavorite = 0,
         fileName = "",
         fileType = "",
+        fileSize = 0,
         coverImage = "",
         lastReadLocator = "";
   //coverImageData = null;
@@ -41,14 +43,15 @@ class Book {
       : id = json['id'],
         title = json['title'],
         author = json['author'],
-        pagelength = json['pagelength'],
-        progressPage = json['progressPage'],
-        progressPercent = json['progressPercent'],
+        // pagelength = json['pagelength'],
+        // progressPage = json['progressPage'],
+        // progressPercent = json['progressPercent'],
         lastRead = DateTime.tryParse(json['lastRead'] ?? ""),
         addedDate = DateTime.tryParse(json['addedDate'] ?? ""),
         isFavorite = json['isFavorite'],
         fileName = json['fileName'],
         fileType = json['fileType'],
+        fileSize = json['fileSize'],
         lastReadLocator = json['lastReadLocator'],
         coverImage = json['coverImage'];
 
@@ -56,9 +59,9 @@ class Book {
         "id": id,
         "title": title,
         "author": author,
-        "pagelength": pagelength,
-        "progressPage": progressPage,
-        "progressPercent": progressPercent,
+        // "pagelength": pagelength,
+        // "progressPage": progressPage,
+        // "progressPercent": progressPercent,
         "lastRead": lastRead != null
             ? DateFormat('yyyy-MM-dd HH:mm:ss').format(lastRead)
             : "",
@@ -68,6 +71,7 @@ class Book {
         "isFavorite": isFavorite,
         "fileName": fileName,
         "fileType": fileType,
+        "fileSize": fileSize,
         "lastReadLocator": lastReadLocator,
         "coverImage": coverImage
       };
@@ -126,8 +130,8 @@ class Book {
     await libraryFile.writeAsString(jsonString);
   }
 
-  static Future<bool> add(Book newBook, String fileExtension, List<int> data,
-      List<int> coverData) async {
+  static Future<bool> add(Book newBook, String fileExtension, int fileSize,
+      List<int> data, List<int> coverData) async {
     try {
       //get all books
       List<Book> books = await Book.get();
@@ -151,6 +155,7 @@ class Book {
 
       newBook.fileName = fileName;
       newBook.fileType = fileExtension;
+      newBook.fileSize = fileSize;
       newBook.coverImage = coverImage;
       books.add(newBook);
 

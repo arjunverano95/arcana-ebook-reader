@@ -1,4 +1,3 @@
-import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -33,28 +32,33 @@ class _FullScreenLoader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 0.5)),
+      decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 0.2)),
       child: Center(
         child: Container(
           padding: EdgeInsets.all(
-            25.sp,
+            5.sp,
           ),
           decoration: BoxDecoration(
             color: Colors.white,
-            // borderRadius: BorderRadius.all(
-            //   Radius.circular(10.sp),
-            // ),
+            borderRadius: BorderRadius.all(
+              Radius.circular(5.sp),
+            ),
           ),
           // height: 140.w,
           // width: 140.w,
-          child: Text(
-            "Please wait ...",
-            style: TextStyle(
-              decoration: TextDecoration.none,
-              color: CustomColors.textNormal,
-              fontSize: 18.sp,
-            ),
+          child: Image.asset(
+            'assets/images/loading.gif',
+            fit: BoxFit.fitWidth,
+            width: 120.sp,
           ),
+          //  Text(
+          //   "Please wait ...",
+          //   style: TextStyle(
+          //     decoration: TextDecoration.none,
+          //     color: CustomColors.textNormal,
+          //     fontSize: 18.sp,
+          //   ),
+          // ),
           // Image.asset('assets/images/loading.gif', fit: BoxFit.fitWidth),
         ),
       ),

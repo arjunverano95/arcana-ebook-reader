@@ -8,7 +8,6 @@ import 'package:epub/epub.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:uuid/uuid.dart';
-import 'package:image/image.dart' as ImageObj;
 
 Future<void> showImportDialog() async {
   if (await Permission.storage.request().isGranted) {
@@ -75,19 +74,6 @@ Future<List<Book>> _importBooks(List<PlatformFile> files) async {
 
       EpubBookRef epubBook = await EpubReader.openBook(bytes);
 
-      ImageObj.Image coverImage = await epubBook.readCover();
-
-      List<int> imageBytes;
-      if (coverImage != null) {
-        // ImageObj.Image thumbnail = ImageObj.copyResize(coverImage,
-        //     width: 390.w.toInt(), height: 530.w.toInt());
-        ImageObj.Image thumbnail =
-            ImageObj.copyResize(coverImage, width: 195, height: 265);
-        imageBytes = ImageObj.encodeJpg(thumbnail);
-        if (imageBytes == null) imageBytes = ImageObj.encodePng(thumbnail);
-        // if (imageBytes == null) imageBytes = ImageObj.encodeTga(thumbnail);
-      }
-
       Book newBook = Book();
       newBook.id = uKey;
       newBook.title = epubBook.Title;
@@ -95,7 +81,8 @@ Future<List<Book>> _importBooks(List<PlatformFile> files) async {
       newBook.addedDate = DateTime.now();
       // newBook.lastRead = DateTime.now();
       newBook.isFavorite = 0;
-      await Book.add(newBook, fileExt, fileSize, bytes, imageBytes);
+      // await Book.add(newBook, fileExt, fileSize, bytes, imageBytes);
+      await Book.add(newBook, fileExt, fileSize, filePath);
       res.add(newBook);
     }
   }

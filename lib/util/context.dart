@@ -1,9 +1,12 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:epub/epub.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:image/image.dart';
 
 class Book {
   String id;
@@ -15,10 +18,9 @@ class Book {
   DateTime lastRead;
   DateTime addedDate;
   int isFavorite;
-  String fileName;
+  String filePath;
   String fileType;
   int fileSize;
-  String coverImage;
   String lastReadLocator;
   List<int> coverImageData;
 
@@ -32,12 +34,11 @@ class Book {
         lastRead = null,
         addedDate = null,
         isFavorite = 0,
-        fileName = "",
+        filePath = "",
         fileType = "",
         fileSize = 0,
-        coverImage = "",
-        lastReadLocator = "";
-  //coverImageData = null;
+        lastReadLocator = "",
+        coverImageData = null;
 
   Book.fromJson(Map<String, dynamic> json)
       : id = json['id'],
@@ -49,11 +50,10 @@ class Book {
         lastRead = DateTime.tryParse(json['lastRead'] ?? ""),
         addedDate = DateTime.tryParse(json['addedDate'] ?? ""),
         isFavorite = json['isFavorite'],
-        fileName = json['fileName'],
+        filePath = json['filePath'],
         fileType = json['fileType'],
         fileSize = json['fileSize'],
-        lastReadLocator = json['lastReadLocator'],
-        coverImage = json['coverImage'];
+        lastReadLocator = json['lastReadLocator'];
 
   Map<String, dynamic> toJson() => {
         "id": id,
@@ -69,51 +69,65 @@ class Book {
             ? DateFormat('yyyy-MM-dd HH:mm:ss').format(addedDate)
             : "",
         "isFavorite": isFavorite,
-        "fileName": fileName,
+        "filePath": filePath,
         "fileType": fileType,
         "fileSize": fileSize,
         "lastReadLocator": lastReadLocator,
-        "coverImage": coverImage
+        // "coverImage": coverImage
       };
 
-  static Future<String> _addToDir(String filename, List<int> data) async {
-    //check book on AppData
-    final appDirectory = await getApplicationDocumentsDirectory();
-    final appDirectoryPath = appDirectory.path;
-    final bookPath = '$appDirectoryPath/$filename';
-    final bookFile = File(bookPath);
+  // static Future<String> _addToDir(String filename, List<int> data) async {
+  //   //check book on AppData
+  //   final appDirectory = await getApplicationDocumentsDirectory();
+  //   final appDirectoryPath = appDirectory.path;
+  //   final bookPath = '$appDirectoryPath/$filename';
+  //   final bookFile = File(bookPath);
 
-    await bookFile.create();
-    await bookFile.writeAsBytes(data);
-    return filename;
-  }
+  //   await bookFile.create();
+  //   await bookFile.writeAsBytes(data);
+  //   return filename;
+  // }
 
-  static Future<void> _deleteToDir(String filename) async {
-    //check book on AppData
-    final appDirectory = await getApplicationDocumentsDirectory();
-    final appDirectoryPath = appDirectory.path;
-    final bookPath = '$appDirectoryPath/$filename';
-    final bookFile = File(bookPath);
-    final exists = await bookFile.exists();
-    //overwrite
-    if (exists) {
-      await bookFile.delete();
-    }
-  }
+  // static Future<void> _deleteToDir(String filename) async {
+  //   //check book on AppData
+  //   final appDirectory = await getApplicationDocumentsDirectory();
+  //   final appDirectoryPath = appDirectory.path;
+  //   final bookPath = '$appDirectoryPath/$filename';
+  //   final bookFile = File(bookPath);
+  //   final exists = await bookFile.exists();
+  //   //overwrite
+  //   if (exists) {
+  //     await bookFile.delete();
+  //   }
+  // }
 
-  static Future<List<int>> _getCoverImageData(String coverImage) async {
+  static Future<List<int>> getCoverImageData(String filePath) async {
     try {
       //get cover
-      if (coverImage == "") return null;
+      if (filePath == "") return null;
 
-      final appDirectory = await getApplicationDocumentsDirectory();
-      final appDirectoryPath = appDirectory.path;
-      final imagePath = '$appDirectoryPath/$coverImage';
-      final imageFile = File(imagePath);
+      // final appDirectory = await getApplicationDocumentsDirectory();
+      // final appDirectoryPath = appDirectory.path;
+      // final imagePath = '$appDirectoryPath/$coverImage';
+      // final imageFile = File(imagePath);
+      var epubFile = File(filePath);
+      Uint8List bytes = await epubFile.readAsBytes();
+      EpubBookRef epubBook = await EpubReader.openBook(bytes);
+      Image coverImage = await epubBook.readCover();
+
+      List<int> imageBytes;
+      if (coverImage != null) {
+        // ImageObj.Image thumbnail = ImageObj.copyResize(coverImage,
+        //     width: 390.w.toInt(), height: 530.w.toInt());
+        Image thumbnail = copyResize(coverImage, width: 195, height: 265);
+        imageBytes = encodeJpg(thumbnail);
+        if (imageBytes == null) imageBytes = encodePng(thumbnail);
+        // if (imageBytes == null) imageBytes = ImageObj.encodeTga(thumbnail);
+      }
 
       // var coverImageData = base64Decode(coverImage);
-      var image = await imageFile.readAsBytes();
-      return image;
+      // var image = await imageFile.readAsBytes();
+      return imageBytes;
     } catch (ex) {
       return null;
     }
@@ -130,8 +144,8 @@ class Book {
     await libraryFile.writeAsString(jsonString);
   }
 
-  static Future<bool> add(Book newBook, String fileExtension, int fileSize,
-      List<int> data, List<int> coverData) async {
+  static Future<bool> add(
+      Book newBook, String fileExtension, int fileSize, String filePath) async {
     try {
       //get all books
       List<Book> books = await Book.get();
@@ -144,19 +158,10 @@ class Book {
         newBook.title =
             newBook.title + "(" + (bookToAdd.length + 1).toString() + ")";
       }
-      //add
-      var fileName = await _addToDir(newBook.id + "." + fileExtension, data);
 
-      var coverImage = "";
-      if (coverData != null) {
-        coverImage = await _addToDir(newBook.id + ".jpg", coverData);
-        //coverImage = base64Encode(coverData);
-      }
-
-      newBook.fileName = fileName;
+      newBook.filePath = filePath;
       newBook.fileType = fileExtension;
       newBook.fileSize = fileSize;
-      newBook.coverImage = coverImage;
       books.add(newBook);
 
       await Book._updateLibrary(books);
@@ -171,11 +176,6 @@ class Book {
     try {
       //get all books
       List<Book> books = await Book.get();
-      Book bookToDelete = books.singleWhere((element) => element.id == id);
-
-      //delete book
-      await Book._deleteToDir(bookToDelete.fileName);
-      await Book._deleteToDir(bookToDelete.coverImage);
       books.removeWhere((element) => element.id == id);
 
       await Book._updateLibrary(books);
@@ -271,16 +271,16 @@ class Book {
     }
   }
 
-  Future<List<int>> getCoverImageData() async {
-    if (this.coverImageData == null && this.coverImage != null)
-      this.coverImageData = await _getCoverImageData(this.coverImage);
-    return this.coverImageData;
+  // Future<List<int>> getCoverImageData() async {
+  //   if (this.coverImageData == null)
+  //     this.coverImageData = await _getCoverImageData(this.filePath);
+  //   return this.coverImageData;
+  // }
+  void setCoverImageData(List<int> bytes) {
+    this.coverImageData = bytes;
   }
 
-  Future<String> getPath() async {
-    final appDirectory = await getApplicationDocumentsDirectory();
-    final appDirectoryPath = appDirectory.path;
-    final bookPath = '$appDirectoryPath/${this.fileName}';
-    return bookPath;
+  String getPath() {
+    return this.filePath;
   }
 }

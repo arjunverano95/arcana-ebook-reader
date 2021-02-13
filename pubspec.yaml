@@ -29,7 +29,7 @@ dependencies:
   file_picker: ^2.0.3
   epub: ^2.1.0
   epub_viewer: ^0.1.9
-  epub_view: ^1.0.0
+  flutter_staggered_animations: "^0.1.2"
   path_provider: ^1.6.18
   uuid: ^2.2.2
   isolate_handler: ^0.3.1

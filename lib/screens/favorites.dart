@@ -5,6 +5,7 @@ import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class Favorites extends StatelessWidget {
   Favorites();
@@ -50,7 +51,17 @@ class FavoritesBodyState extends State<FavoritesBody> {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: books.length,
           itemBuilder: (context, i) {
-            return _buildRows(books[i], i);
+            return AnimationConfiguration.staggeredList(
+              position: i,
+              duration: const Duration(milliseconds: 375),
+              child: SlideAnimation(
+                verticalOffset: 50.0,
+                child: FadeInAnimation(
+                  child: _buildRows(books[i], i),
+                ),
+              ),
+            );
+            //return _buildRows(books[i], i);
           });
     } else {
       return Container();
@@ -59,36 +70,39 @@ class FavoritesBodyState extends State<FavoritesBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: CustomColors.background,
-      appBar: AppBar(
-        centerTitle: false,
-        title: Text('Favorites',
-            style: TextStyle(color: Colors.white, fontSize: 30.sp)),
-        actions: [
-          IconButton(
-              icon: Icon(Icons.sort_by_alpha, color: Colors.white, size: 44.sp),
-              onPressed: () => setState(() {
-                    _sort = (_sort == "asc" ? "desc" : "asc");
-                  })),
-          IconButton(
-            icon: Icon(Icons.search, color: Colors.white, size: 44.sp),
-            onPressed: () {},
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: CustomColors.background,
+        appBar: AppBar(
+          centerTitle: false,
+          title: Text('Favorites',
+              style: TextStyle(color: Colors.white, fontSize: 30.sp)),
+          actions: [
+            IconButton(
+                icon:
+                    Icon(Icons.sort_by_alpha, color: Colors.white, size: 44.sp),
+                onPressed: () => setState(() {
+                      _sort = (_sort == "asc" ? "desc" : "asc");
+                    })),
+            IconButton(
+              icon: Icon(Icons.search, color: Colors.white, size: 44.sp),
+              onPressed: () {},
+            ),
+          ],
+          leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.white, size: 44.sp),
+              onPressed: () => env.navigation.pop()),
+        ),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(30.sp),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(),
+            child: Column(children: [
+              Observer(
+                builder: (_) => _listBooks(),
+              )
+            ]),
           ),
-        ],
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white, size: 44.sp),
-            onPressed: () => env.navigation.pop()),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(30.sp),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(),
-          child: Column(children: [
-            Observer(
-              builder: (_) => _listBooks(),
-            )
-          ]),
         ),
       ),
     );

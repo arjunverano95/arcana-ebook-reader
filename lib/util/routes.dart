@@ -19,12 +19,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
           settings: settings, builder: (context) => Library());
 
-// TODO 
+// TODO
     default:
       return MaterialPageRoute(
-        builder: (context) => Scaffold(
-          body: Center(
-            child: Text('Error Loading Screen'),
+        builder: (context) => SafeArea(
+          child: Scaffold(
+            body: Center(
+              child: Text('Error Loading Screen'),
+            ),
           ),
         ),
       );

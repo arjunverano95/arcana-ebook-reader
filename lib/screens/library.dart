@@ -7,6 +7,7 @@ import 'package:arcana_ebook_reader/widgets/loading_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class Library extends StatelessWidget {
   Library();
@@ -50,7 +51,17 @@ class LibraryBodyState extends State<LibraryBody> {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: books.length,
           itemBuilder: (context, i) {
-            return _buildRows(books[i], i);
+            return AnimationConfiguration.staggeredList(
+              position: i,
+              duration: const Duration(milliseconds: 375),
+              child: SlideAnimation(
+                verticalOffset: 50.0,
+                child: FadeInAnimation(
+                  child: _buildRows(books[i], i),
+                ),
+              ),
+            );
+            //return _buildRows(books[i], i);
           });
     } else {
       return Container();
@@ -60,96 +71,99 @@ class LibraryBodyState extends State<LibraryBody> {
   @override
   Widget build(BuildContext context) {
     final overlay = LoadingOverlay.of(context);
-    return Scaffold(
-      key: _key,
-      backgroundColor: CustomColors.background,
-      endDrawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.all(0.sp),
-          children: <Widget>[
-            DrawerHeader(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    height: 140.w,
-                    width: 140.w,
-                    child: Image.asset(
-                        'assets/images/arcana_ebook_reader_transparent.png',
-                        fit: BoxFit.fitWidth),
-                  ),
-                  Text(
-                    'Arcana Ebook Reader',
-                    style: TextStyle(color: Colors.white, fontSize: 30.sp),
-                  ),
-                ],
+    return SafeArea(
+      child: Scaffold(
+        key: _key,
+        backgroundColor: CustomColors.background,
+        endDrawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.all(0.sp),
+            children: <Widget>[
+              DrawerHeader(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      height: 140.w,
+                      width: 140.w,
+                      child: Image.asset(
+                          'assets/images/arcana_ebook_reader_transparent.png',
+                          fit: BoxFit.fitWidth),
+                    ),
+                    Text(
+                      'Arcana Ebook Reader',
+                      style: TextStyle(color: Colors.white, fontSize: 30.sp),
+                    ),
+                  ],
+                ),
+                decoration: BoxDecoration(
+                  color: CustomColors.normal,
+                ),
               ),
-              decoration: BoxDecoration(
-                color: CustomColors.normal,
+              ListTile(
+                leading: Icon(
+                  Icons.file_download,
+                  color: CustomColors.normal,
+                  size: 44.sp,
+                ),
+                title: Text(
+                  'Import books',
+                  style: TextStyle(
+                      color: CustomColors.textNormal, fontSize: 28.sp),
+                ),
+                onTap: () {
+                  env.navigation.pop();
+                  overlay.during(showImportDialog());
+                },
               ),
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.file_download,
-                color: CustomColors.normal,
-                size: 44.sp,
-              ),
-              title: Text(
-                'Import books',
-                style:
-                    TextStyle(color: CustomColors.textNormal, fontSize: 28.sp),
-              ),
-              onTap: () {
-                env.navigation.pop();
-                overlay.during(showImportDialog());
-              },
-            ),
-            // ListTile(
-            //   leading: Icon(
-            //     Icons.scanner,
-            //     color: CustomColors.normal,
-            //   ),
-            //   title: Text(
-            //     'Scan books in directory',
-            //     style: TextStyle(color: CustomColors.textNormal, fontSize: 28.sp),
-            //   ),
-            //   onTap: () {},
-            // ),
-          ],
-        ),
-      ),
-      appBar: AppBar(
-        centerTitle: false,
-        title: Text('Library',
-            style: TextStyle(color: Colors.white, fontSize: 30.sp)),
-        actions: [
-          IconButton(
-              icon: Icon(Icons.sort_by_alpha, color: Colors.white, size: 44.sp),
-              onPressed: () => setState(() {
-                    _sort = (_sort == "asc" ? "desc" : "asc");
-                  })),
-          IconButton(
-            icon: Icon(Icons.search, color: Colors.white, size: 44.sp),
-            onPressed: () {},
+              // ListTile(
+              //   leading: Icon(
+              //     Icons.scanner,
+              //     color: CustomColors.normal,
+              //   ),
+              //   title: Text(
+              //     'Scan books in directory',
+              //     style: TextStyle(color: CustomColors.textNormal, fontSize: 28.sp),
+              //   ),
+              //   onTap: () {},
+              // ),
+            ],
           ),
-          IconButton(
-              icon: Icon(Icons.menu, color: Colors.white, size: 44.sp),
-              onPressed: () => _key.currentState.openEndDrawer())
-        ],
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white, size: 44.sp),
-            onPressed: () => env.navigation.pop()),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(30.sp),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(),
-          child: Column(children: [
-            Observer(
-              builder: (_) => _listBooks(),
-            )
-          ]),
+        ),
+        appBar: AppBar(
+          centerTitle: false,
+          title: Text('Library',
+              style: TextStyle(color: Colors.white, fontSize: 30.sp)),
+          actions: [
+            IconButton(
+                icon:
+                    Icon(Icons.sort_by_alpha, color: Colors.white, size: 44.sp),
+                onPressed: () => setState(() {
+                      _sort = (_sort == "asc" ? "desc" : "asc");
+                    })),
+            IconButton(
+              icon: Icon(Icons.search, color: Colors.white, size: 44.sp),
+              onPressed: () {},
+            ),
+            IconButton(
+                icon: Icon(Icons.menu, color: Colors.white, size: 44.sp),
+                onPressed: () => _key.currentState.openEndDrawer())
+          ],
+          leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.white, size: 44.sp),
+              onPressed: () => env.navigation.pop()),
+        ),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(30.sp),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(),
+            child: Column(children: [
+              Observer(
+                builder: (_) => _listBooks(),
+              )
+            ]),
+          ),
         ),
       ),
     );

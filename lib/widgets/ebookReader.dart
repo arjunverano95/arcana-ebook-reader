@@ -7,14 +7,14 @@ import 'package:arcana_ebook_reader/env.dart';
 
 Future<void> readEbook(Book book) async {
   if (book.fileType == "epub") {
-    await _epubViewer(book);
+    _epubViewer(book);
   }
   book.updateLastRead().then((value) => env.bookstore.getBooks());
 }
 
-Future<void> _epubViewer(Book book) async {
-  String path = await book.getPath();
-
+void _epubViewer(Book book) {
+  String path = book.getPath();
+  // TODO Ebook not found. delete?
   EpubViewer.setConfig(
     themeColor: CustomColors.normal,
     identifier: "book",
@@ -38,4 +38,9 @@ Future<void> _epubViewer(Book book) async {
         .updateLastReadLocator(locator)
         .then((value) => env.bookstore.getBooks());
   });
+
+  // const pageChannel = const EventChannel('com.jideguru.epub_viewer/page');
+  // pageChannel.receiveBroadcastStream().listen((event) {
+  //   print(event);
+  // });
 }

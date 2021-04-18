@@ -60,7 +60,7 @@ Future<void> showImportDialog() async {
 // }
 
 Future<List<Book>> _importBooks(List<PlatformFile> files) async {
-  List<Book> res = List<Book>();
+  List<Book> res = [];
   for (var i = 0; i < files.length; i++) {
     PlatformFile file = files[i];
 

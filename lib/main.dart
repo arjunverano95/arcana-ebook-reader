@@ -20,8 +20,8 @@ Future<void> main() async {
   // OrientationBuilder(builder: (context, orientation) { })
   runApp(ScreenUtilInit(
     designSize: Size(750, 1334),
-    allowFontScaling: true,
-    child: MaterialApp(
+    // allowFontScaling: true,
+    builder: () => MaterialApp(
       navigatorKey: env.navigation.navigatorKey,
       title: 'Arcana Ebook Reader',
       onGenerateRoute: generateRoute,

@@ -241,8 +241,10 @@ class HomeBodyState extends State<HomeBody>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      RaisedButton.icon(
-                        color: CustomColors.normal,
+                      ElevatedButton.icon(
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                                CustomColors.normal)),
                         onPressed: () => overlay.during(showImportDialog()),
                         icon: Icon(Icons.file_download,
                             color: Colors.white, size: 44.sp),

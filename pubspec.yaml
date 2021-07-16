@@ -26,16 +26,16 @@ dependencies:
   shared_preferences:
   intl: ^0.17.0
   http: ^0.13.1
-  file_picker: ^2.0.3
+  file_picker: ^3.0.3
   epub: ^2.1.0
-  epub_viewer: ^0.1.9
+  epub_viewer: ^0.2.2
   flutter_staggered_animations: "^1.0.0"
-  path_provider: ^1.6.18
+  path_provider: ^2.0.2
   uuid: ^2.2.2
   isolate_handler: ^0.3.1
   mobx: ^1.2.1+4
   flutter_mobx: ^1.1.0+2
-  permission_handler: ^5.0.1
+  permission_handler: ^8.1.2
   flutter_screenutil: ^5.0.0
 
 dev_dependencies:

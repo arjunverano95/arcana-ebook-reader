@@ -4,7 +4,6 @@ import 'package:arcana_ebook_reader/util/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 // import 'package:flutter/services.dart';
 import 'screens/home.dart';

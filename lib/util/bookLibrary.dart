@@ -2,16 +2,15 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:arcana_ebook_reader/dto/BookDtos.dart';
+import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/models/Book.dart';
 import 'package:epub/epub.dart';
-import 'package:hive/hive.dart';
 import 'package:image/image.dart';
 
 class BookLibrary {
   static const name = 'books';
   BookLibrary() {
-    Hive.registerAdapter(BookAdapter(), override: true);
-    //var books = await Hive.openBox('books');
+    //var books = Hive.box('books');
   }
 
   static Future<List<int>> getCoverImageData(String filePath) async {
@@ -62,11 +61,10 @@ class BookLibrary {
         book.title = book.title + "(" + (bookToAdd.length + 1).toString() + ")";
       }
 
+      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
       var newBook = Book.fromDto(book);
-
-      var hiveBox = await Hive.openBox<Book>(BookLibrary.name);
-      hiveBox.put(newBook.id, newBook);
-      await hiveBox.close();
+      await hiveBox.put(newBook.id, newBook);
+      // await hiveBox.close();
 
       return true;
     } catch (ex) {
@@ -76,9 +74,9 @@ class BookLibrary {
 
   static Future<bool> delete(String id) async {
     try {
-      var hiveBox = await Hive.openBox<Book>(BookLibrary.name);
-      hiveBox.delete(id);
-      await hiveBox.close();
+      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
+      await hiveBox.delete(id);
+      // await hiveBox.close();
 
       return true;
     } catch (ex) {
@@ -88,9 +86,9 @@ class BookLibrary {
 
   static Future<BookDto> get(String id) async {
     try {
-      var hiveBox = await Hive.openBox<Book>(BookLibrary.name);
+      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
       Book book = hiveBox.get(id);
-      await hiveBox.close();
+      // await hiveBox.close();
 
       return new BookDto.fromBook(book);
     } catch (ex) {
@@ -100,26 +98,26 @@ class BookLibrary {
 
   static Future<List<BookDto>> getAll() async {
     try {
-      var hiveBox = await Hive.openBox<Book>(BookLibrary.name);
+      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
       var library = hiveBox.values.map((e) => new BookDto.fromBook(e)).toList();
-      await hiveBox.close();
+      // await hiveBox.close();
 
       return library;
     } catch (ex) {
-      return null;
+      return [];
     }
   }
 
   static Future<bool> updateFavorite(String id) async {
     try {
-      var hiveBox = await Hive.openBox<Book>(BookLibrary.name);
+      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
       Book bookToUpdate = hiveBox.get(id);
 
       //update book
       bookToUpdate.isFavorite = bookToUpdate.isFavorite == 1 ? 0 : 1;
-      bookToUpdate.save();
+      await bookToUpdate.save();
 
-      await hiveBox.close();
+      // await hiveBox.close();
 
       return true;
     } catch (ex) {
@@ -129,14 +127,14 @@ class BookLibrary {
 
   static Future<bool> updateLastRead(String id) async {
     try {
-      var hiveBox = await Hive.openBox<Book>(BookLibrary.name);
+      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
       Book bookToUpdate = hiveBox.get(id);
 
       //update book
       bookToUpdate.lastRead = DateTime.now();
-      bookToUpdate.save();
+      await bookToUpdate.save();
 
-      await hiveBox.close();
+      // await hiveBox.close();
 
       return true;
     } catch (ex) {
@@ -146,14 +144,14 @@ class BookLibrary {
 
   static Future<bool> updateLastReadLocator(String id, String locator) async {
     try {
-      var hiveBox = await Hive.openBox<Book>(BookLibrary.name);
+      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
       Book bookToUpdate = hiveBox.get(id);
 
       //update book
       bookToUpdate.lastReadLocator = locator;
-      bookToUpdate.save();
+      await bookToUpdate.save();
 
-      await hiveBox.close();
+      // await hiveBox.close();
 
       return true;
     } catch (ex) {

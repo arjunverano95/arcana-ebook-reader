@@ -12,7 +12,6 @@ import 'package:uuid/uuid.dart';
 
 Future<void> showImportDialog() async {
   if (await Permission.storage.request().isGranted) {
-    // final isolates = IsolateHandler();
     var result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.custom,
@@ -21,21 +20,6 @@ Future<void> showImportDialog() async {
 
     if (result != null) {
       if (result.files.length > 0) {
-        // String file = jsonEncode(result.files
-        //     .map((e) => {
-        //           "path": e.path,
-        //           "extension": e.extension,
-        //         })
-        //     .toList());
-
-        // isolates.spawn<bool>(importBooks,
-        //     name: 'importBooks',
-        //     onReceive: (value) {
-        //       isolates.kill('importBooks');
-        //       env.bookstore.getBooks();
-        //     },
-        //     onInitialized: () => isolates.send(file, to: 'importBooks'));
-        // await compute(_importBooks, result.files);
         var books = await _importBooks(result.files);
         env.bookstore.getBooks();
         if (books.length == 1) readEbook(books[0]);

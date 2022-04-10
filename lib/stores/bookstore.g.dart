@@ -12,13 +12,13 @@ mixin _$Bookstore on _Bookstore, Store {
   final _$booksAtom = Atom(name: '_Bookstore.books');
 
   @override
-  List<Book> get books {
+  List<BookDto> get books {
     _$booksAtom.reportRead();
     return super.books;
   }
 
   @override
-  set books(List<Book> value) {
+  set books(List<BookDto> value) {
     _$booksAtom.reportWrite(value, super.books, () {
       super.books = value;
     });

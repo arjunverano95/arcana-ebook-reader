@@ -1,6 +1,6 @@
+import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
-import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -29,14 +29,14 @@ class FavoritesBodyState extends State<FavoritesBody> {
     super.initState();
   }
 
-  Widget _buildRows(Book book, int index) {
+  Widget _buildRows(BookDto book, int index) {
     return BookTile(
       book: book,
     );
   }
 
   Widget _listBooks() {
-    List<Book> books = List.from(env.bookstore.books);
+    List<BookDto> books = List.from(env.bookstore.books);
     if (books != null && books.length > 0)
       books = books.where((a) => a.isFavorite == 1).toList();
 

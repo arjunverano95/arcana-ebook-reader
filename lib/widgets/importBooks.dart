@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
-import 'package:arcana_ebook_reader/util/context.dart';
+import 'package:arcana_ebook_reader/util/bookLibrary.dart';
 import 'package:arcana_ebook_reader/widgets/ebookReader.dart';
 import 'package:epub/epub.dart';
 import 'package:file_picker/file_picker.dart';
@@ -59,8 +60,8 @@ Future<void> showImportDialog() async {
 //   });
 // }
 
-Future<List<Book>> _importBooks(List<PlatformFile> files) async {
-  List<Book> res = [];
+Future<List<BookDto>> _importBooks(List<PlatformFile> files) async {
+  List<BookDto> res = [];
   for (var i = 0; i < files.length; i++) {
     PlatformFile file = files[i];
 
@@ -74,15 +75,19 @@ Future<List<Book>> _importBooks(List<PlatformFile> files) async {
 
       EpubBookRef epubBook = await EpubReader.openBook(bytes);
 
-      Book newBook = Book();
+      BookDto newBook = BookDto();
       newBook.id = uKey;
       newBook.title = epubBook.Title;
       newBook.author = epubBook.Author;
       newBook.addedDate = DateTime.now();
       // newBook.lastRead = DateTime.now();
       newBook.isFavorite = 0;
-      // await Book.add(newBook, fileExt, fileSize, bytes, imageBytes);
-      await Book.add(newBook, fileExt, fileSize, filePath);
+
+      newBook.filePath = filePath;
+      newBook.fileSize = fileSize;
+      newBook.fileType = fileExt;
+      // await BookDto.add(newBook, fileExt, fileSize, bytes, imageBytes);
+      await BookLibrary.add(newBook);
       res.add(newBook);
     }
   }

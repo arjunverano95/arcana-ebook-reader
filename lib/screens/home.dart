@@ -1,6 +1,6 @@
+import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
-import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:arcana_ebook_reader/widgets/importBooks.dart';
 import 'package:arcana_ebook_reader/widgets/loading_overlay.dart';
@@ -45,7 +45,7 @@ class HomeBodyState extends State<HomeBody>
     ).animate(_recentReadAnimationController);
   }
 
-  Widget _buildRows(Book book, int index) {
+  Widget _buildRows(BookDto book, int index) {
     return BookTile(
       book: book,
       infoOnly: true,
@@ -53,9 +53,9 @@ class HomeBodyState extends State<HomeBody>
   }
 
   Widget _recentRead() {
-    Book recentRead;
+    BookDto recentRead;
     if (env.bookstore.books != null && env.bookstore.books.length > 0) {
-      List<Book> recentReads = List.from(env.bookstore.books);
+      List<BookDto> recentReads = List.from(env.bookstore.books);
       recentReads.removeWhere((item) => item.lastRead == null);
       if (recentReads.length > 0) {
         recentReads.sort((a, b) => b.lastRead.compareTo(a.lastRead));
@@ -71,7 +71,7 @@ class HomeBodyState extends State<HomeBody>
   }
 
   Widget _recentAdded() {
-    List<Book> recentAdded;
+    List<BookDto> recentAdded;
     if (env.bookstore.books != null && env.bookstore.books.length > 0) {
       recentAdded = List.from(env.bookstore.books);
       recentAdded.sort((a, b) => b.addedDate.compareTo(a.addedDate));

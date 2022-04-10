@@ -1,5 +1,6 @@
+import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
-import 'package:arcana_ebook_reader/util/context.dart';
+import 'package:arcana_ebook_reader/util/bookLibrary.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/widgets/ebookReader.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,7 @@ import 'package:isolate_handler/isolate_handler.dart';
 enum CoverSize { md, lg } //sm, xl
 
 class BookTile extends StatefulWidget {
-  final Book book;
+  final BookDto book;
   final CoverSize size;
   final bool infoOnly;
 
@@ -23,7 +24,7 @@ class _BookTileState extends State<BookTile> {
   final isolates = IsolateHandler();
   @override
   Widget build(BuildContext context) {
-    Book book = widget.book;
+    BookDto book = widget.book;
     CoverSize size = widget.size;
     bool infoOnly = widget.infoOnly;
 
@@ -53,7 +54,7 @@ class _BookTileState extends State<BookTile> {
     void setCoverImage(List<int> bytes) {
       // We will no longer be needing the isolate, let's dispose of it.
       isolates.kill("getCoverImage_" + book.id);
-      book.setCoverImageData(bytes);
+      book.coverImageData = bytes;
       setState(() {
         coverImage = bytes == null
             ? Image.asset('assets/images/no_cover.jpg',
@@ -158,7 +159,7 @@ class _BookTileState extends State<BookTile> {
                             ),
                             onSelected: (String result) {
                               if (result == "Delete") {
-                                Book.delete(book.id)
+                                BookLibrary.delete(book.id)
                                     .then((value) => env.bookstore.getBooks());
                               }
                             },
@@ -262,8 +263,9 @@ class _BookTileState extends State<BookTile> {
                                           ? Colors.red
                                           : CustomColors.normal,
                                       onPressed: () {
-                                        book.updateFavorite().then((value) =>
-                                            env.bookstore.getBooks());
+                                        BookLibrary.updateFavorite(book.id)
+                                            .then((value) =>
+                                                env.bookstore.getBooks());
                                         setState(() {
                                           book.isFavorite =
                                               book.isFavorite == 1 ? 0 : 1;
@@ -300,6 +302,7 @@ void getCoverImage(Map<String, dynamic> context) {
   messenger.listen((filePath) {
     // Add one to the count and send the new value back to the main
     // isolate.
-    Book.getCoverImageData(filePath).then((value) => messenger.send(value));
+    BookLibrary.getCoverImageData(filePath)
+        .then((value) => messenger.send(value));
   });
 }

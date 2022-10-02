@@ -18,10 +18,10 @@ class Book extends HiveObject {
   // int progressPercent;
 
   @HiveField(3)
-  DateTime lastRead;
+  DateTime? lastRead;
 
   @HiveField(4)
-  DateTime addedDate;
+  DateTime? addedDate;
 
   @HiveField(5)
   int isFavorite;
@@ -39,16 +39,16 @@ class Book extends HiveObject {
   String lastReadLocator;
 
   Book(
-      {this.id,
-      this.title,
-      this.author,
-      this.lastRead,
-      this.addedDate,
-      this.isFavorite,
-      this.filePath,
-      this.fileType,
-      this.fileSize,
-      this.lastReadLocator});
+      {required this.id,
+      required this.title,
+      required this.author,
+      required this.lastRead,
+      required this.addedDate,
+      required this.isFavorite,
+      required this.filePath,
+      required this.fileType,
+      required this.fileSize,
+      required this.lastReadLocator});
 
   factory Book.fromDto(BookDto b) {
     return Book(

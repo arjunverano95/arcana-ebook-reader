@@ -27,7 +27,7 @@ void _epubViewer(BookDto book) {
 
   EpubViewer.open(
     path,
-    lastLocation: book.lastReadLocator == null || book.lastReadLocator == ""
+    lastLocation: book.lastReadLocator == ""
         ? null
         : EpubLocator.fromJson(
             jsonDecode(book.lastReadLocator),

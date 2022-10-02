@@ -5,7 +5,7 @@ import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/bookLibrary.dart';
 import 'package:arcana_ebook_reader/widgets/ebookReader.dart';
-import 'package:epub/epub.dart';
+import 'package:epubx/epubx.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:uuid/uuid.dart';
@@ -49,9 +49,9 @@ Future<List<BookDto>> _importBooks(List<PlatformFile> files) async {
   for (var i = 0; i < files.length; i++) {
     PlatformFile file = files[i];
 
-    String filePath = file.path;
+    String filePath = file.path ?? '';
     int fileSize = file.size;
-    String fileExt = file.extension.toLowerCase();
+    String fileExt = file.extension ?? ''.toLowerCase();
     if (fileExt == "epub") {
       String uKey = Uuid().v1();
       var epubFile = File(filePath);
@@ -61,8 +61,8 @@ Future<List<BookDto>> _importBooks(List<PlatformFile> files) async {
 
       BookDto newBook = BookDto();
       newBook.id = uKey;
-      newBook.title = epubBook.Title;
-      newBook.author = epubBook.Author;
+      newBook.title = epubBook.Title ?? '';
+      newBook.author = epubBook.Author ?? '';
       newBook.addedDate = DateTime.now();
       // newBook.lastRead = DateTime.now();
       newBook.isFavorite = 0;

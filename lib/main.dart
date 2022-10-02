@@ -18,20 +18,31 @@ Future<void> main() async {
   ]);
 
   await BuildEnvironment.init();
+  runApp(const ArcanaEbookReader());
+}
 
-  // OrientationBuilder(builder: (context, orientation) { })
-  runApp(ScreenUtilInit(
-    designSize: Size(750, 1334),
-    // allowFontScaling: true,
-    builder: () => MaterialApp(
-      navigatorKey: env.navigation.navigatorKey,
-      title: 'Arcana Ebook Reader',
-      onGenerateRoute: generateRoute,
-      theme: ThemeData(
-        primaryColor: CustomColors.normal,
-      ),
-      home: Home(),
-      // builder: EasyLoading.init(),
-    ),
-  ));
+class ArcanaEbookReader extends StatelessWidget {
+  const ArcanaEbookReader({super.key});
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return ScreenUtilInit(
+      designSize: Size(750, 1334),
+      // allowFontScaling: true,
+      builder: (context, child) {
+        return MaterialApp(
+          navigatorKey: env.navigation.navigatorKey,
+          title: 'Arcana Ebook Reader',
+          onGenerateRoute: generateRoute,
+          theme: ThemeData(
+            primaryColor: CustomColors.normal,
+          ),
+          home: child,
+          // builder: EasyLoading.init(),
+        );
+      },
+      child: Home(),
+    );
+  }
 }

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/bookLibrary.dart';
@@ -13,7 +15,8 @@ class BookTile extends StatefulWidget {
   final CoverSize size;
   final bool infoOnly;
 
-  BookTile({@required this.book, this.size, this.infoOnly});
+  BookTile(
+      {required this.book, this.size = CoverSize.md, this.infoOnly = false});
 
   @override
   _BookTileState createState() => _BookTileState();
@@ -26,8 +29,8 @@ class _BookTileState extends State<BookTile> {
     CoverSize size = widget.size;
     bool infoOnly = widget.infoOnly;
 
-    if (infoOnly == null) infoOnly = false;
-    if (size == null) size = CoverSize.md;
+    // if (infoOnly == null) infoOnly = false;
+    // if (size == null) size = CoverSize.md;
 
     double coverWidth = 0;
     double containerHeight = 0;
@@ -44,16 +47,15 @@ class _BookTileState extends State<BookTile> {
 
     Future<Image> getCoverImage() async {
       // TODO: Load on background
-      if (book.coverImageData != null) {
-        return Image.memory(book.coverImageData,
+      var coverImageData = book.coverImageData;
+      if (coverImageData != null) {
+        return Image.memory(Uint8List.fromList(coverImageData),
             fit: BoxFit.fitWidth, key: Key("cv_" + book.id));
-      }
-
-      if (book.coverImageData == null) {
+      } else {
         var imgData = await BookLibrary.getCoverImageData(book.filePath);
         if (imgData != null) {
           book.coverImageData = imgData;
-          return Image.memory(imgData,
+          return Image.memory(Uint8List.fromList(imgData),
               fit: BoxFit.fitWidth, key: Key("cv_" + book.id + "_new"));
         }
       }
@@ -89,7 +91,7 @@ class _BookTileState extends State<BookTile> {
                   future: getCoverImage(),
                   builder: (BuildContext context, AsyncSnapshot<Image> image) {
                     if (image.hasData) {
-                      return image.data; // image is ready
+                      return image.data!; // image is ready
                     } else {
                       return Image.asset(
                         'assets/images/no_cover.jpg',

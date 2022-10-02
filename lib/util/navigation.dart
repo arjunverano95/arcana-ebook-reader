@@ -5,16 +5,17 @@ class Navigation {
 
   // Navigation() : navigatorKey =  GlobalKey<NavigatorState>();
 
-  Future<dynamic> navigate(String routeName, {dynamic arguments}) {
-    return navigatorKey.currentState.pushNamed(routeName, arguments: arguments);
+  Future<dynamic>? navigate(String routeName, {dynamic arguments}) {
+    return navigatorKey.currentState
+        ?.pushNamed(routeName, arguments: arguments);
   }
 
-  Future<dynamic> popAndNavigate(String routeName, {dynamic arguments}) {
+  Future<dynamic>? popAndNavigate(String routeName, {dynamic arguments}) {
     return navigatorKey.currentState
-        .popAndPushNamed(routeName, arguments: arguments);
+        ?.popAndPushNamed(routeName, arguments: arguments);
   }
 
   void pop() {
-    return navigatorKey.currentState.pop();
+    return navigatorKey.currentState?.pop();
   }
 }

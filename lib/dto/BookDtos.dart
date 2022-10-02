@@ -7,14 +7,14 @@ class BookDto {
   // int pagelength;
   // int progressPage;
   // int progressPercent;
-  DateTime lastRead;
-  DateTime addedDate;
+  DateTime? lastRead;
+  DateTime? addedDate;
   int isFavorite;
   String filePath;
   String fileType;
   int fileSize;
   String lastReadLocator;
-  List<int> coverImageData;
+  List<int>? coverImageData;
 
   BookDto()
       : id = "",

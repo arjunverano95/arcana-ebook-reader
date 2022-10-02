@@ -37,14 +37,12 @@ class FavoritesBodyState extends State<FavoritesBody> {
 
   Widget _listBooks() {
     List<BookDto> books = List.from(env.bookstore.books);
-    if (books != null && books.length > 0)
+    if (books.length > 0)
       books = books.where((a) => a.isFavorite == 1).toList();
 
-    if (books != null && _sort == "asc")
-      books.sort((a, b) => a.title.compareTo(b.title));
-    if (books != null && _sort == "desc")
-      books.sort((a, b) => b.title.compareTo(a.title));
-    if (books != null && books.length > 0) {
+    if (_sort == "asc") books.sort((a, b) => a.title.compareTo(b.title));
+    if (_sort == "desc") books.sort((a, b) => b.title.compareTo(a.title));
+    if (books.length > 0) {
       return ListView.builder(
           shrinkWrap: true,
           primary: false,

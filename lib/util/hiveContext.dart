@@ -3,7 +3,7 @@ import 'package:arcana_ebook_reader/util/bookLibrary.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class HiveContext {
-  Box<Book> books;
+  late Box<Book> books;
   Future<bool> init() async {
     try {
       await Hive.initFlutter();

@@ -76,7 +76,7 @@ class HomeBodyState extends State<HomeBody>
     List<BookDto> recentAdded = [];
     if (env.bookstore.books.length > 0) {
       recentAdded = List.from(env.bookstore.books);
-      recentAdded.sort((a, b) => b.addedDate.compareToWithNull(a.addedDate));
+      recentAdded.sort((a, b) => b.addedDate.compareTo(a.addedDate));
       recentAdded = recentAdded.take(7).toList();
     }
 

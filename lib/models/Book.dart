@@ -21,7 +21,7 @@ class Book extends HiveObject {
   DateTime? lastRead;
 
   @HiveField(4)
-  DateTime? addedDate;
+  DateTime addedDate;
 
   @HiveField(5)
   int isFavorite;

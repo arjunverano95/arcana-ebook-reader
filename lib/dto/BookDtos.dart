@@ -8,7 +8,7 @@ class BookDto {
   // int progressPage;
   // int progressPercent;
   DateTime? lastRead;
-  DateTime? addedDate;
+  DateTime addedDate;
   int isFavorite;
   String filePath;
   String fileType;
@@ -21,7 +21,7 @@ class BookDto {
         title = "",
         author = "",
         lastRead = null,
-        addedDate = null,
+        addedDate = DateTime.now(),
         isFavorite = 0,
         filePath = "",
         fileType = "",

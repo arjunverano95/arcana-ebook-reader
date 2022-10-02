@@ -1,34 +1,36 @@
+import 'dart:typed_data';
+
+import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
-import 'package:arcana_ebook_reader/util/context.dart';
+import 'package:arcana_ebook_reader/util/bookLibrary.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/widgets/ebookReader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:isolate_handler/isolate_handler.dart';
 
 enum CoverSize { md, lg } //sm, xl
 
 class BookTile extends StatefulWidget {
-  final Book book;
+  final BookDto book;
   final CoverSize size;
   final bool infoOnly;
 
-  BookTile({@required this.book, this.size, this.infoOnly});
+  BookTile(
+      {required this.book, this.size = CoverSize.md, this.infoOnly = false});
 
   @override
   _BookTileState createState() => _BookTileState();
 }
 
 class _BookTileState extends State<BookTile> {
-  final isolates = IsolateHandler();
   @override
   Widget build(BuildContext context) {
-    Book book = widget.book;
+    BookDto book = widget.book;
     CoverSize size = widget.size;
     bool infoOnly = widget.infoOnly;
 
-    if (infoOnly == null) infoOnly = false;
-    if (size == null) size = CoverSize.md;
+    // if (infoOnly == null) infoOnly = false;
+    // if (size == null) size = CoverSize.md;
 
     double coverWidth = 0;
     double containerHeight = 0;
@@ -42,33 +44,23 @@ class _BookTileState extends State<BookTile> {
       // coverHeight = 230;
       // containerHeight = 230;
     }
-    Image coverImage = Image.asset('assets/images/no_cover.jpg',
-        fit: BoxFit.fitWidth, key: Key("cv_loading")); //TODO loading image
 
-    if (book.coverImageData != null) {
-      coverImage = Image.memory(book.coverImageData,
-          fit: BoxFit.fitWidth, key: Key("cv_" + book.id));
-    }
-
-    void setCoverImage(List<int> bytes) {
-      // We will no longer be needing the isolate, let's dispose of it.
-      isolates.kill("getCoverImage_" + book.id);
-      book.setCoverImageData(bytes);
-      setState(() {
-        coverImage = bytes == null
-            ? Image.asset('assets/images/no_cover.jpg',
-                fit: BoxFit.fitWidth, key: Key("cv_none"))
-            : Image.memory(bytes,
-                fit: BoxFit.fitWidth, key: Key("cv_" + book.id + "_new"));
-      });
-    }
-
-    if (book.coverImageData == null) {
-      isolates.spawn<List<int>>(getCoverImage,
-          name: "getCoverImage_" + book.id,
-          onReceive: setCoverImage,
-          onInitialized: () =>
-              isolates.send(book.filePath, to: "getCoverImage_" + book.id));
+    Future<Image> getCoverImage() async {
+      // TODO: Load on background
+      var coverImageData = book.coverImageData;
+      if (coverImageData != null) {
+        return Image.memory(Uint8List.fromList(coverImageData),
+            fit: BoxFit.fitWidth, key: Key("cv_" + book.id));
+      } else {
+        var imgData = await BookLibrary.getCoverImageData(book.filePath);
+        if (imgData != null) {
+          book.coverImageData = imgData;
+          return Image.memory(Uint8List.fromList(imgData),
+              fit: BoxFit.fitWidth, key: Key("cv_" + book.id + "_new"));
+        }
+      }
+      return Image.asset('assets/images/no_cover.jpg',
+          fit: BoxFit.fitWidth, key: Key("cv_none"));
     }
 
     return InkWell(
@@ -95,33 +87,23 @@ class _BookTileState extends State<BookTile> {
                 ],
               ),
               child: ClipRect(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 500),
-                  // transitionBuilder:
-                  //     (Widget child, Animation<double> animation) {
-                  //   return ScaleTransition(child: child, scale: animation);
-                  // },
-                  child: coverImage,
+                child: FutureBuilder(
+                  future: getCoverImage(),
+                  builder: (BuildContext context, AsyncSnapshot<Image> image) {
+                    if (image.hasData) {
+                      return image.data!; // image is ready
+                    } else {
+                      return Image.asset(
+                        'assets/images/no_cover.jpg',
+                        fit: BoxFit.fitWidth,
+                        key: Key("cv_loading"),
+                      );
+                    }
+                  },
                 ),
-
-                // FutureBuilder(
-                //   future: book.getCoverImageData(),
-                //   builder: (BuildContext context,
-                //       AsyncSnapshot<List<int>> snapshot) {
-                //     if (snapshot.connectionState == ConnectionState.waiting &&
-                //         snapshot.hasData == false) {
-                //       return Image.asset('assets/images/no_cover.jpg',
-                //           fit: BoxFit.fitWidth);
-                //     } else {
-                //       var image = snapshot.data;
-                //       if (image == null) {
-                //         return Image.asset('assets/images/no_cover.jpg',
-                //             fit: BoxFit.fitWidth);
-                //       } else {
-                //         return Image.memory(image, fit: BoxFit.fitWidth);
-                //       }
-                //     }
-                //   },
+                //  AnimatedSwitcher(
+                //   duration: const Duration(milliseconds: 500),
+                //   child: null
                 // ),
               ),
             ),
@@ -158,7 +140,7 @@ class _BookTileState extends State<BookTile> {
                             ),
                             onSelected: (String result) {
                               if (result == "Delete") {
-                                Book.delete(book.id)
+                                BookLibrary.delete(book.id)
                                     .then((value) => env.bookstore.getBooks());
                               }
                             },
@@ -262,8 +244,9 @@ class _BookTileState extends State<BookTile> {
                                           ? Colors.red
                                           : CustomColors.normal,
                                       onPressed: () {
-                                        book.updateFavorite().then((value) =>
-                                            env.bookstore.getBooks());
+                                        BookLibrary.updateFavorite(book.id)
+                                            .then((value) =>
+                                                env.bookstore.getBooks());
                                         setState(() {
                                           book.isFavorite =
                                               book.isFavorite == 1 ? 0 : 1;
@@ -289,17 +272,11 @@ class _BookTileState extends State<BookTile> {
   }
 }
 
-// This function happens in the isolate.
-void getCoverImage(Map<String, dynamic> context) {
-  // Calling initialize from the entry point with the context is
-  // required if communication is desired. It returns a messenger which
-  // allows listening and sending information to the main isolate.
-  final messenger = HandledIsolate.initialize(context);
+// void getCoverImage(Map<String, dynamic> context) {
+//   final messenger = HandledIsolate.initialize(context);
 
-  // Triggered every time data is received from the main isolate.
-  messenger.listen((filePath) {
-    // Add one to the count and send the new value back to the main
-    // isolate.
-    Book.getCoverImageData(filePath).then((value) => messenger.send(value));
-  });
-}
+//   messenger.listen((filePath) {
+//     BookLibrary.getCoverImageData(filePath)
+//         .then((value) => messenger.send(value));
+//   });
+// }

@@ -1,6 +1,6 @@
+import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
-import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:arcana_ebook_reader/widgets/importBooks.dart';
 import 'package:arcana_ebook_reader/widgets/loading_overlay.dart';
@@ -32,19 +32,17 @@ class LibraryBodyState extends State<LibraryBody> {
     super.initState();
   }
 
-  Widget _buildRows(Book book, int index) {
+  Widget _buildRows(BookDto book, int index) {
     return BookTile(book: book);
   }
 
   Widget _listBooks() {
-    List<Book> books = List.from(env.bookstore.books);
+    List<BookDto> books = List.from(env.bookstore.books);
 
-    if (books != null && _sort == "asc")
-      books.sort((a, b) => a.title.compareTo(b.title));
-    if (books != null && _sort == "desc")
-      books.sort((a, b) => b.title.compareTo(a.title));
+    if (_sort == "asc") books.sort((a, b) => a.title.compareTo(b.title));
+    if (_sort == "desc") books.sort((a, b) => b.title.compareTo(a.title));
 
-    if (books != null && books.length > 0) {
+    if (books.length > 0) {
       return ListView.builder(
           shrinkWrap: true,
           primary: false,
@@ -148,7 +146,7 @@ class LibraryBodyState extends State<LibraryBody> {
             ),
             IconButton(
                 icon: Icon(Icons.menu, color: Colors.white, size: 44.sp),
-                onPressed: () => _key.currentState.openEndDrawer())
+                onPressed: () => _key.currentState?.openEndDrawer())
           ],
           leading: IconButton(
               icon: Icon(Icons.arrow_back, color: Colors.white, size: 44.sp),

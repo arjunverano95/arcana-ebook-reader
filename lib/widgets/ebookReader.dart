@@ -1,19 +1,20 @@
 import 'dart:convert';
 
-import 'package:arcana_ebook_reader/util/context.dart';
+import 'package:arcana_ebook_reader/dto/BookDtos.dart';
+import 'package:arcana_ebook_reader/util/bookLibrary.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:epub_viewer/epub_viewer.dart';
 import 'package:arcana_ebook_reader/env.dart';
 
-Future<void> readEbook(Book book) async {
+Future<void> readEbook(BookDto book) async {
   if (book.fileType == "epub") {
     _epubViewer(book);
   }
-  book.updateLastRead().then((value) => env.bookstore.getBooks());
+  BookLibrary.updateLastRead(book.id).then((value) => env.bookstore.getBooks());
 }
 
-void _epubViewer(Book book) {
-  String path = book.getPath();
+void _epubViewer(BookDto book) {
+  String path = book.filePath;
   // TODO Ebook not found. delete?
   EpubViewer.setConfig(
     themeColor: CustomColors.normal,
@@ -26,7 +27,7 @@ void _epubViewer(Book book) {
 
   EpubViewer.open(
     path,
-    lastLocation: book.lastReadLocator == null || book.lastReadLocator == ""
+    lastLocation: book.lastReadLocator == ""
         ? null
         : EpubLocator.fromJson(
             jsonDecode(book.lastReadLocator),
@@ -34,8 +35,7 @@ void _epubViewer(Book book) {
   );
 
   EpubViewer.locatorStream.listen((locator) {
-    book
-        .updateLastReadLocator(locator)
+    BookLibrary.updateLastReadLocator(book.id, locator)
         .then((value) => env.bookstore.getBooks());
   });
 

@@ -1,6 +1,6 @@
+import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
-import 'package:arcana_ebook_reader/util/context.dart';
 import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:arcana_ebook_reader/widgets/importBooks.dart';
 import 'package:arcana_ebook_reader/widgets/loading_overlay.dart';
@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:arcana_ebook_reader/extension.dart';
 
 class Home extends StatelessWidget {
   Home();
@@ -28,8 +29,8 @@ class HomeBody extends StatefulWidget {
 class HomeBodyState extends State<HomeBody>
     with SingleTickerProviderStateMixin {
   HomeBodyState();
-  AnimationController _recentReadAnimationController;
-  Animation _recentReadAnimation;
+  late AnimationController _recentReadAnimationController;
+  late Animation<double> _recentReadAnimation;
 
   @override
   void initState() {
@@ -45,7 +46,7 @@ class HomeBodyState extends State<HomeBody>
     ).animate(_recentReadAnimationController);
   }
 
-  Widget _buildRows(Book book, int index) {
+  Widget _buildRows(BookDto book, int index) {
     return BookTile(
       book: book,
       infoOnly: true,
@@ -53,12 +54,13 @@ class HomeBodyState extends State<HomeBody>
   }
 
   Widget _recentRead() {
-    Book recentRead;
-    if (env.bookstore.books != null && env.bookstore.books.length > 0) {
-      List<Book> recentReads = List.from(env.bookstore.books);
-      recentReads.removeWhere((item) => item.lastRead == null);
+    BookDto? recentRead;
+    if (env.bookstore.books.length > 0) {
+      List<BookDto> recentReads =
+          List.from(env.bookstore.books.where((item) => item.lastRead != null));
+
       if (recentReads.length > 0) {
-        recentReads.sort((a, b) => b.lastRead.compareTo(a.lastRead));
+        recentReads.sort((a, b) => b.lastRead.compareToWithNull(a.lastRead));
         recentRead = recentReads[0];
       }
     }
@@ -71,14 +73,14 @@ class HomeBodyState extends State<HomeBody>
   }
 
   Widget _recentAdded() {
-    List<Book> recentAdded;
-    if (env.bookstore.books != null && env.bookstore.books.length > 0) {
+    List<BookDto> recentAdded = [];
+    if (env.bookstore.books.length > 0) {
       recentAdded = List.from(env.bookstore.books);
       recentAdded.sort((a, b) => b.addedDate.compareTo(a.addedDate));
       recentAdded = recentAdded.take(7).toList();
     }
 
-    if (recentAdded != null && recentAdded.length > 0) {
+    if (recentAdded.length > 0) {
       return ListView.builder(
           shrinkWrap: true,
           primary: false,
@@ -227,8 +229,7 @@ class HomeBodyState extends State<HomeBody>
               ),
               Observer(
                 builder: (_) => Container(
-                  decoration: (env.bookstore.books != null &&
-                          env.bookstore.books.length > 0)
+                  decoration: (env.bookstore.books.length > 0)
                       ? BoxDecoration(
                           border: Border(
                             top: BorderSide(

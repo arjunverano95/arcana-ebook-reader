@@ -20,44 +20,51 @@ Future<void> showImportDialog() async {
 
     if (result != null) {
       if (result.files.length > 0) {
-        var books = await _importBooks(result.files);
-        env.bookstore.getBooks();
-        if (books.length == 1) readEbook(books[0]);
+        // var toRead = await flutterCompute(_importBooks, result.files);
+        if (result.files.length == 1) {
+          var file = result.files[0];
+          var toRead = await _importBook(file)
+              .whenComplete(() => env.bookstore.getBooks());
+
+          if (toRead != null) {
+            var book = await BookLibrary.get(toRead);
+            if (book != null) readEbook(book);
+          }
+        } else {
+          await Future.wait(result.files.map((file) async {
+            await _importBook(file);
+          })).whenComplete(() => env.bookstore.getBooks());
+        }
       }
     }
   }
 }
 
-Future<List<BookDto>> _importBooks(List<PlatformFile> files) async {
-  List<BookDto> res = [];
-  for (var i = 0; i < files.length; i++) {
-    PlatformFile file = files[i];
+Future<String?> _importBook(PlatformFile file) async {
+  String filePath = file.path ?? '';
+  int fileSize = file.size;
+  String fileExt = file.extension ?? ''.toLowerCase();
+  if (fileExt == "epub") {
+    String uKey = Uuid().v1();
+    var epubFile = File(filePath);
+    Uint8List bytes = await epubFile.readAsBytes();
 
-    String filePath = file.path ?? '';
-    int fileSize = file.size;
-    String fileExt = file.extension ?? ''.toLowerCase();
-    if (fileExt == "epub") {
-      String uKey = Uuid().v1();
-      var epubFile = File(filePath);
-      Uint8List bytes = await epubFile.readAsBytes();
+    EpubBookRef epubBook = await EpubReader.openBook(bytes);
 
-      EpubBookRef epubBook = await EpubReader.openBook(bytes);
+    BookDto newBook = BookDto();
+    newBook.id = uKey;
+    newBook.title = epubBook.Title ?? '';
+    newBook.author = epubBook.Author ?? '';
+    newBook.addedDate = DateTime.now();
+    // newBook.lastRead = DateTime.now();
+    newBook.isFavorite = 0;
 
-      BookDto newBook = BookDto();
-      newBook.id = uKey;
-      newBook.title = epubBook.Title ?? '';
-      newBook.author = epubBook.Author ?? '';
-      newBook.addedDate = DateTime.now();
-      // newBook.lastRead = DateTime.now();
-      newBook.isFavorite = 0;
-
-      newBook.filePath = filePath;
-      newBook.fileSize = fileSize;
-      newBook.fileType = fileExt;
-      newBook.coverImageData = await BookLibrary.getCoverImageData(filePath);
-      await BookLibrary.add(newBook);
-      res.add(newBook);
-    }
+    newBook.filePath = filePath;
+    newBook.fileSize = fileSize;
+    newBook.fileType = fileExt;
+    newBook.coverImageData = await BookLibrary.getCoverImageData(filePath);
+    await BookLibrary.add(newBook);
+    return newBook.id;
   }
-  return res;
+  return null;
 }

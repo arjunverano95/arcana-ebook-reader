@@ -121,8 +121,8 @@ class _BookTileState extends State<BookTile> {
                             ),
                             onSelected: (String result) {
                               if (result == "Delete") {
-                                BookLibrary.delete(book.id)
-                                    .then((value) => env.bookstore.getBooks());
+                                BookLibrary.delete(book.id).whenComplete(
+                                    () => env.bookstore.getBooks());
                               }
                             },
                             itemBuilder: (BuildContext context) =>

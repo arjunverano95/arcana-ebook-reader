@@ -27,11 +27,7 @@ class BookLibrary {
 
         Image thumbnail = copyResize(coverImage, width: 195, height: 265);
         imageBytes = encodeJpg(thumbnail);
-        // if (imageBytes == null) imageBytes = encodePng(thumbnail);
-        // if (imageBytes == null) imageBytes = encodeTga(thumbnail);
-        // if (imageBytes == null) imageBytes = encodeGif(thumbnail);
-        // if (imageBytes == null) imageBytes = encodeCur(thumbnail);
-        // if (imageBytes == null) imageBytes = encodeIco(thumbnail);
+        // imageBytes = thumbnail.getBytes();
 
         return imageBytes;
       }

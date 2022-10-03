@@ -10,7 +10,8 @@ Future<void> readEbook(BookDto book) async {
   if (book.fileType == "epub") {
     _epubViewer(book);
   }
-  BookLibrary.updateLastRead(book.id).then((value) => env.bookstore.getBooks());
+  BookLibrary.updateLastRead(book.id)
+      .whenComplete(() => env.bookstore.getBooks());
 }
 
 void _epubViewer(BookDto book) {
@@ -36,7 +37,7 @@ void _epubViewer(BookDto book) {
 
   EpubViewer.locatorStream.listen((locator) {
     BookLibrary.updateLastReadLocator(book.id, locator)
-        .then((value) => env.bookstore.getBooks());
+        .whenComplete(() => env.bookstore.getBooks());
   });
 }
 

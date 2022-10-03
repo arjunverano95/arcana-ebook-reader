@@ -38,6 +38,9 @@ class Book extends HiveObject {
   @HiveField(9)
   String lastReadLocator;
 
+  @HiveField(10)
+  List<int>? coverImageData;
+
   Book(
       {required this.id,
       required this.title,
@@ -48,7 +51,8 @@ class Book extends HiveObject {
       required this.filePath,
       required this.fileType,
       required this.fileSize,
-      required this.lastReadLocator});
+      required this.lastReadLocator,
+      required this.coverImageData});
 
   factory Book.fromDto(BookDto b) {
     return Book(
@@ -61,6 +65,7 @@ class Book extends HiveObject {
         filePath: b.filePath,
         fileType: b.fileType,
         fileSize: b.fileSize,
-        lastReadLocator: b.lastReadLocator);
+        lastReadLocator: b.lastReadLocator,
+        coverImageData: b.coverImageData);
   }
 }

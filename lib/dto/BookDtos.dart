@@ -40,5 +40,5 @@ class BookDto {
         fileType = b.fileType,
         fileSize = b.fileSize,
         lastReadLocator = b.lastReadLocator,
-        coverImageData = null;
+        coverImageData = b.coverImageData;
 }

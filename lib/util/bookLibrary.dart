@@ -17,11 +17,6 @@ class BookLibrary {
     try {
       //get cover
       if (filePath == "") return null;
-
-      // final appDirectory = await getApplicationDocumentsDirectory();
-      // final appDirectoryPath = appDirectory.path;
-      // final imagePath = '$appDirectoryPath/$coverImage';
-      // final imageFile = File(imagePath);
       var epubFile = File(filePath);
       Uint8List bytes = await epubFile.readAsBytes();
       EpubBookRef epubBook = await EpubReader.openBook(bytes);
@@ -30,8 +25,6 @@ class BookLibrary {
       if (coverImage != null) {
         List<int> imageBytes = [];
 
-        // ImageObj.Image thumbnail = ImageObj.copyResize(coverImage,
-        //     width: 390.w.toInt(), height: 530.w.toInt());
         Image thumbnail = copyResize(coverImage, width: 195, height: 265);
         imageBytes = encodeJpg(thumbnail);
         // if (imageBytes == null) imageBytes = encodePng(thumbnail);
@@ -40,8 +33,6 @@ class BookLibrary {
         // if (imageBytes == null) imageBytes = encodeCur(thumbnail);
         // if (imageBytes == null) imageBytes = encodeIco(thumbnail);
 
-        // var coverImageData = base64Decode(coverImage);
-        // var image = await imageFile.readAsBytes();
         return imageBytes;
       }
       return null;
@@ -63,10 +54,9 @@ class BookLibrary {
         book.title = book.title + "(" + (bookToAdd.length + 1).toString() + ")";
       }
 
-      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
+      var hiveBox = env.context.books;
       var newBook = Book.fromDto(book);
       await hiveBox.put(newBook.id, newBook);
-      // await hiveBox.close();
 
       return true;
     } catch (ex) {
@@ -76,9 +66,8 @@ class BookLibrary {
 
   static Future<bool> delete(String id) async {
     try {
-      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
+      var hiveBox = env.context.books;
       await hiveBox.delete(id);
-      // await hiveBox.close();
 
       return true;
     } catch (ex) {
@@ -88,9 +77,9 @@ class BookLibrary {
 
   static Future<BookDto?> get(String id) async {
     try {
-      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
+      var hiveBox = env.context.books;
       Book? book = hiveBox.get(id);
-      // await hiveBox.close();
+
       if (book != null) return new BookDto.fromBook(book);
       return null;
     } catch (ex) {
@@ -100,9 +89,8 @@ class BookLibrary {
 
   static Future<List<BookDto>> getAll() async {
     try {
-      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
+      var hiveBox = env.context.books;
       var library = hiveBox.values.map((e) => new BookDto.fromBook(e)).toList();
-      // await hiveBox.close();
 
       return library;
     } catch (ex) {
@@ -112,7 +100,7 @@ class BookLibrary {
 
   static Future<bool> updateFavorite(String id) async {
     try {
-      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
+      var hiveBox = env.context.books;
       Book? bookToUpdate = hiveBox.get(id);
       if (bookToUpdate != null) {
         //update book
@@ -122,7 +110,6 @@ class BookLibrary {
         return true;
       }
       return false;
-      // await hiveBox.close();
     } catch (ex) {
       return false;
     }
@@ -130,7 +117,7 @@ class BookLibrary {
 
   static Future<bool> updateLastRead(String id) async {
     try {
-      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
+      var hiveBox = env.context.books;
       Book? bookToUpdate = hiveBox.get(id);
       if (bookToUpdate != null) {
         //update book
@@ -139,7 +126,7 @@ class BookLibrary {
 
         return true;
       }
-      // await hiveBox.close();
+
       return false;
     } catch (ex) {
       return false;
@@ -148,7 +135,7 @@ class BookLibrary {
 
   static Future<bool> updateLastReadLocator(String id, String locator) async {
     try {
-      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
+      var hiveBox = env.context.books;
       Book? bookToUpdate = hiveBox.get(id);
       if (bookToUpdate != null) {
         //update book
@@ -157,17 +144,10 @@ class BookLibrary {
 
         return true;
       }
-      // await hiveBox.close();
+
       return false;
     } catch (ex) {
       return false;
     }
   }
-
-  // Future<List<int>> getCoverImageData() async {
-  //   if (this.coverImageData == null)
-  //     this.coverImageData = await _getCoverImageData(this.filePath);
-  //   return this.coverImageData;
-  // }
-
 }

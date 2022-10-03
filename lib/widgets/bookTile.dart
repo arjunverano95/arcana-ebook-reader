@@ -29,9 +29,6 @@ class _BookTileState extends State<BookTile> {
     CoverSize size = widget.size;
     bool infoOnly = widget.infoOnly;
 
-    // if (infoOnly == null) infoOnly = false;
-    // if (size == null) size = CoverSize.md;
-
     double coverWidth = 0;
     double containerHeight = 0;
     if (size == CoverSize.md) {
@@ -40,24 +37,13 @@ class _BookTileState extends State<BookTile> {
     } else if (size == CoverSize.lg) {
       coverWidth = 300.w;
       containerHeight = 410.w;
-      // coverWidth = 169;
-      // coverHeight = 230;
-      // containerHeight = 230;
     }
 
     Future<Image> getCoverImage() async {
-      // TODO: Load on background
       var coverImageData = book.coverImageData;
       if (coverImageData != null) {
         return Image.memory(Uint8List.fromList(coverImageData),
             fit: BoxFit.fitWidth, key: Key("cv_" + book.id));
-      } else {
-        var imgData = await BookLibrary.getCoverImageData(book.filePath);
-        if (imgData != null) {
-          book.coverImageData = imgData;
-          return Image.memory(Uint8List.fromList(imgData),
-              fit: BoxFit.fitWidth, key: Key("cv_" + book.id + "_new"));
-        }
       }
       return Image.asset('assets/images/no_cover.jpg',
           fit: BoxFit.fitWidth, key: Key("cv_none"));
@@ -73,7 +59,6 @@ class _BookTileState extends State<BookTile> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              // height: coverHeight,
               width: coverWidth,
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -82,7 +67,7 @@ class _BookTileState extends State<BookTile> {
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 1,
                     blurRadius: 3,
-                    offset: Offset(0, 3), // changes position of shadow
+                    offset: Offset(0, 3),
                   ),
                 ],
               ),
@@ -101,10 +86,6 @@ class _BookTileState extends State<BookTile> {
                     }
                   },
                 ),
-                //  AnimatedSwitcher(
-                //   duration: const Duration(milliseconds: 500),
-                //   child: null
-                // ),
               ),
             ),
             Expanded(
@@ -271,12 +252,3 @@ class _BookTileState extends State<BookTile> {
     );
   }
 }
-
-// void getCoverImage(Map<String, dynamic> context) {
-//   final messenger = HandledIsolate.initialize(context);
-
-//   messenger.listen((filePath) {
-//     BookLibrary.getCoverImageData(filePath)
-//         .then((value) => messenger.send(value));
-//   });
-// }

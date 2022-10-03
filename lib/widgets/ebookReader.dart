@@ -38,9 +38,9 @@ void _epubViewer(BookDto book) {
     BookLibrary.updateLastReadLocator(book.id, locator)
         .then((value) => env.bookstore.getBooks());
   });
+}
 
   // const pageChannel = const EventChannel('com.jideguru.epub_viewer/page');
   // pageChannel.receiveBroadcastStream().listen((event) {
   //   print(event);
   // });
-}

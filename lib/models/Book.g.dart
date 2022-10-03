@@ -20,20 +20,21 @@ class BookAdapter extends TypeAdapter<Book> {
       id: fields[0] as String,
       title: fields[1] as String,
       author: fields[2] as String,
-      lastRead: fields[3] as DateTime,
+      lastRead: fields[3] as DateTime?,
       addedDate: fields[4] as DateTime,
       isFavorite: fields[5] as int,
       filePath: fields[6] as String,
       fileType: fields[7] as String,
       fileSize: fields[8] as int,
       lastReadLocator: fields[9] as String,
+      coverImageData: (fields[10] as List?)?.cast<int>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, Book obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -53,7 +54,9 @@ class BookAdapter extends TypeAdapter<Book> {
       ..writeByte(8)
       ..write(obj.fileSize)
       ..writeByte(9)
-      ..write(obj.lastReadLocator);
+      ..write(obj.lastReadLocator)
+      ..writeByte(10)
+      ..write(obj.coverImageData);
   }
 
   @override

@@ -97,7 +97,6 @@ class HomeBodyState extends State<HomeBody>
                 ),
               ),
             );
-            // return _buildRows(recentAdded[i], i);
           });
     } else {
       return Container();

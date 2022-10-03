@@ -44,22 +44,11 @@ class _FullScreenLoader extends StatelessWidget {
               Radius.circular(5.sp),
             ),
           ),
-          // height: 140.w,
-          // width: 140.w,
           child: Image.asset(
             'assets/images/loading.gif',
             fit: BoxFit.fitWidth,
             width: 120.sp,
           ),
-          //  Text(
-          //   "Please wait ...",
-          //   style: TextStyle(
-          //     decoration: TextDecoration.none,
-          //     color: CustomColors.textNormal,
-          //     fontSize: 18.sp,
-          //   ),
-          // ),
-          // Image.asset('assets/images/loading.gif', fit: BoxFit.fitWidth),
         ),
       ),
     );

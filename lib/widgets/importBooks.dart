@@ -28,22 +28,6 @@ Future<void> showImportDialog() async {
   }
 }
 
-// This function happens in the isolate.
-// void importBooks(Map<String, dynamic> context) {
-//   final messenger = HandledIsolate.initialize(context);
-
-//   messenger.listen((message) async {
-//     var files = (json.decode(message) as List)
-//         .map((e) => {
-//               "path": e.path.toString(),
-//               "extension": e.extension.toString(),
-//             })
-//         .toList();
-//     bool value = await _importBooks(files);
-//     messenger.send(value);
-//   });
-// }
-
 Future<List<BookDto>> _importBooks(List<PlatformFile> files) async {
   List<BookDto> res = [];
   for (var i = 0; i < files.length; i++) {
@@ -70,7 +54,7 @@ Future<List<BookDto>> _importBooks(List<PlatformFile> files) async {
       newBook.filePath = filePath;
       newBook.fileSize = fileSize;
       newBook.fileType = fileExt;
-      // await BookDto.add(newBook, fileExt, fileSize, bytes, imageBytes);
+      newBook.coverImageData = await BookLibrary.getCoverImageData(filePath);
       await BookLibrary.add(newBook);
       res.add(newBook);
     }

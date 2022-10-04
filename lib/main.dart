@@ -36,8 +36,10 @@ class ArcanaEbookReader extends StatelessWidget {
           title: 'Arcana Ebook Reader',
           onGenerateRoute: generateRoute,
           theme: ThemeData(
-            primaryColor: CustomColors.normal,
-          ),
+              primaryColor: CustomColors.normal,
+              appBarTheme: AppBarTheme(
+                color: CustomColors.normal, //<-- SEE HERE
+              )),
           home: child,
           // builder: EasyLoading.init(),
         );

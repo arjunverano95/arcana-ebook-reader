@@ -141,7 +141,7 @@ class _BookTileState extends State<BookTile> {
                           Text(
                             book.fileType.toUpperCase() +
                                 ", " +
-                                ((book.fileSize / 1000)).toStringAsFixed(1) +
+                                ((book.fileSize / 1000000)).toStringAsFixed(1) +
                                 "MB",
                             style: TextStyle(
                               color: CustomColors.textHighlight,
@@ -212,8 +212,8 @@ class _BookTileState extends State<BookTile> {
                                           : CustomColors.normal,
                                       onPressed: () {
                                         BookLibrary.updateFavorite(book.id)
-                                            .then((value) =>
-                                                env.bookstore.getBooks());
+                                            .whenComplete(
+                                                () => env.bookstore.getBooks());
                                         setState(() {
                                           book.isFavorite =
                                               book.isFavorite == 1 ? 0 : 1;

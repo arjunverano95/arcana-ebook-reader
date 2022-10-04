@@ -11,6 +11,9 @@ Future<void> readEbook(BookDto book) async {
   if (book.fileType == "epub") {
     _epubViewer(book);
   }
+
+  BookLibrary.updateLastRead(book.id)
+      .whenComplete(() => env.bookstore.getBooks());
 }
 
 void _epubViewer(BookDto book) {
@@ -39,9 +42,6 @@ void _epubViewer(BookDto book) {
               jsonDecode(book.lastReadLocator),
             ),
     );
-
-    BookLibrary.updateLastRead(book.id)
-        .whenComplete(() => env.bookstore.getBooks());
   } else {
     BookLibrary.delete(book.id).whenComplete(() => env.bookstore.getBooks());
   }

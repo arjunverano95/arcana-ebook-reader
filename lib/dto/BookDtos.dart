@@ -14,7 +14,7 @@ class BookDto {
   String fileType;
   int fileSize;
   String lastReadLocator;
-  List<int>? coverImageData;
+  List<int> coverImageData;
 
   BookDto()
       : id = "",
@@ -27,7 +27,7 @@ class BookDto {
         fileType = "",
         fileSize = 0,
         lastReadLocator = "",
-        coverImageData = null;
+        coverImageData = [];
 
   BookDto.fromBook(Book b)
       : id = b.id,

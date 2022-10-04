@@ -27,7 +27,7 @@ class BookAdapter extends TypeAdapter<Book> {
       fileType: fields[7] as String,
       fileSize: fields[8] as int,
       lastReadLocator: fields[9] as String,
-      coverImageData: (fields[10] as List?)?.cast<int>(),
+      coverImageData: (fields[10] as List).cast<int>(),
     );
   }
 

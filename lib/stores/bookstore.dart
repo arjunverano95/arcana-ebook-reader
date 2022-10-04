@@ -14,6 +14,16 @@ abstract class _Bookstore with Store {
   Future<void> getBooks() async {
     var newBooks = await BookLibrary.getAll();
 
+    List<BookDto> oldBooks = List.from(books);
+    final lookup = Map.fromIterable(oldBooks,
+        key: (m) => m.id as String, value: (m) => m as BookDto);
+
+    newBooks = newBooks.map((book) {
+      var oldBook = lookup[book.id];
+      if (oldBook != null) book.coverImageData = oldBook.coverImageData;
+      return book;
+    }).toList();
+
     books = newBooks;
   }
 }

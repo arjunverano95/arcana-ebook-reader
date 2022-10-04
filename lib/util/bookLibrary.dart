@@ -1,10 +1,10 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/models/Book.dart';
 import 'package:epubx/epubx.dart';
+import 'package:flutter/services.dart';
 import 'package:image/image.dart';
 
 class BookLibrary {
@@ -13,10 +13,13 @@ class BookLibrary {
     //var books = Hive.box('books');
   }
 
-  static Future<List<int>?> getCoverImageData(String filePath) async {
+  static Future<List<int>> getCoverImageData(String filePath) async {
+    var assetFile = await rootBundle.load('assets/images/no_cover.jpg');
+    var noCoverImage = assetFile.buffer
+        .asUint8List(assetFile.offsetInBytes, assetFile.lengthInBytes);
     try {
       //get cover
-      if (filePath == "") return null;
+      if (filePath == "") return noCoverImage.buffer.asUint8List();
       var epubFile = File(filePath);
       Uint8List bytes = await epubFile.readAsBytes();
       EpubBookRef epubBook = await EpubReader.openBook(bytes);
@@ -31,9 +34,9 @@ class BookLibrary {
 
         return imageBytes;
       }
-      return null;
+      return noCoverImage;
     } catch (ex) {
-      return null;
+      return noCoverImage;
     }
   }
 

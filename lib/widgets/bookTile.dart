@@ -39,16 +39,6 @@ class _BookTileState extends State<BookTile> {
       containerHeight = 410.w;
     }
 
-    Future<Image> getCoverImage() async {
-      var coverImageData = book.coverImageData;
-      if (coverImageData != null) {
-        return Image.memory(Uint8List.fromList(coverImageData),
-            fit: BoxFit.fitWidth, key: Key("cv_" + book.id));
-      }
-      return Image.asset('assets/images/no_cover.jpg',
-          fit: BoxFit.fitWidth, key: Key("cv_none"));
-    }
-
     return InkWell(
       onTap: () => readEbook(book),
       child: Container(
@@ -72,21 +62,17 @@ class _BookTileState extends State<BookTile> {
                 ],
               ),
               child: ClipRect(
-                child: FutureBuilder(
-                  future: getCoverImage(),
-                  builder: (BuildContext context, AsyncSnapshot<Image> image) {
-                    if (image.hasData) {
-                      return image.data!; // image is ready
-                    } else {
-                      return Image.asset(
-                        'assets/images/no_cover.jpg',
-                        fit: BoxFit.fitWidth,
-                        key: Key("cv_loading"),
-                      );
-                    }
-                  },
-                ),
-              ),
+                  child: Stack(
+                children: <Widget>[
+                  Image.asset('assets/images/no_cover.jpg',
+                      fit: BoxFit.fitWidth, key: Key("cv_none")),
+                  Image.memory(
+                    Uint8List.fromList(book.coverImageData),
+                    fit: BoxFit.fitWidth,
+                    key: Key("cv_" + book.id),
+                  ),
+                ],
+              )),
             ),
             Expanded(
               child: Container(

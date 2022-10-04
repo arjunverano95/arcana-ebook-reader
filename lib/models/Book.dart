@@ -39,7 +39,7 @@ class Book extends HiveObject {
   String lastReadLocator;
 
   @HiveField(10)
-  List<int>? coverImageData;
+  List<int> coverImageData;
 
   Book(
       {required this.id,

@@ -32,7 +32,7 @@ class _FullScreenLoader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 0.2)),
+      decoration: const BoxDecoration(color: Color.fromRGBO(0, 0, 0, 0.2)),
       child: Center(
         child: Container(
           padding: EdgeInsets.all(

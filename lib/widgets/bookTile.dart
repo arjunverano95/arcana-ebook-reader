@@ -15,14 +15,17 @@ class BookTile extends StatefulWidget {
   final CoverSize size;
   final bool infoOnly;
 
-  BookTile(
-      {required this.book, this.size = CoverSize.md, this.infoOnly = false});
+  const BookTile(
+      {super.key,
+      required this.book,
+      this.size = CoverSize.md,
+      this.infoOnly = false});
 
   @override
-  _BookTileState createState() => _BookTileState();
+  BookTileState createState() => BookTileState();
 }
 
-class _BookTileState extends State<BookTile> {
+class BookTileState extends State<BookTile> {
   @override
   Widget build(BuildContext context) {
     BookDto book = widget.book;
@@ -57,7 +60,7 @@ class _BookTileState extends State<BookTile> {
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 1,
                     blurRadius: 3,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -65,11 +68,11 @@ class _BookTileState extends State<BookTile> {
                   child: Stack(
                 children: <Widget>[
                   Image.asset('assets/images/no_cover.jpg',
-                      fit: BoxFit.fitWidth, key: Key("cv_none")),
+                      fit: BoxFit.fitWidth, key: const Key("cv_none")),
                   Image.memory(
                     Uint8List.fromList(book.coverImageData),
                     fit: BoxFit.fitWidth,
-                    key: Key("cv_" + book.id),
+                    key: Key("cv_${book.id}"),
                   ),
                 ],
               )),
@@ -89,7 +92,7 @@ class _BookTileState extends State<BookTile> {
                           child: Text(
                             (book.title.length < 40)
                                 ? book.title
-                                : book.title.substring(0, 40) + "...",
+                                : "${book.title.substring(0, 40)}...",
                             style: TextStyle(
                                 color: CustomColors.textDark,
                                 fontWeight: FontWeight.bold,
@@ -139,10 +142,7 @@ class _BookTileState extends State<BookTile> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            book.fileType.toUpperCase() +
-                                ", " +
-                                ((book.fileSize / 1000000)).toStringAsFixed(1) +
-                                "MB",
+                            "${book.fileType.toUpperCase()}, ${((book.fileSize / 1000000)).toStringAsFixed(1)}MB",
                             style: TextStyle(
                               color: CustomColors.textHighlight,
                               fontSize: 24.sp,

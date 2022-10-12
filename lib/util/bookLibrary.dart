@@ -48,9 +48,9 @@ class BookLibrary {
       //title already exist
       List<BookDto> bookToAdd =
           books.where((element) => element.title == book.title).toList();
-      if (bookToAdd.length > 0) {
+      if (bookToAdd.isNotEmpty) {
         //Book.delete(book.id);
-        book.title = book.title + "(" + (bookToAdd.length + 1).toString() + ")";
+        book.title = "${book.title}(${bookToAdd.length + 1})";
       }
 
       var hiveBox = env.context.books;
@@ -79,7 +79,7 @@ class BookLibrary {
       var hiveBox = env.context.books;
       Book? book = hiveBox.get(id);
 
-      if (book != null) return new BookDto.fromBook(book);
+      if (book != null) return BookDto.fromBook(book);
       return null;
     } catch (ex) {
       return null;
@@ -89,7 +89,7 @@ class BookLibrary {
   static Future<List<BookDto>> getAll() async {
     try {
       var hiveBox = env.context.books;
-      var library = hiveBox.values.map((e) => new BookDto.fromBook(e)).toList();
+      var library = hiveBox.values.map((e) => BookDto.fromBook(e)).toList();
 
       return library;
     } catch (ex) {

@@ -7,20 +7,20 @@ Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
     case 'home':
       return MaterialPageRoute(
-          settings: settings, builder: (context) => Home());
+          settings: settings, builder: (context) => const Home());
 
     case 'favorites':
       return MaterialPageRoute(
-          settings: settings, builder: (context) => Favorites());
+          settings: settings, builder: (context) => const Favorites());
 
     case 'library':
       return MaterialPageRoute(
-          settings: settings, builder: (context) => Library());
+          settings: settings, builder: (context) => const Library());
 
 // TODO
     default:
       return MaterialPageRoute(
-        builder: (context) => SafeArea(
+        builder: (context) => const SafeArea(
           child: Scaffold(
             body: Center(
               child: Text('Error Loading Screen'),

@@ -28,7 +28,7 @@ class ArcanaEbookReader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: Size(750, 1334),
+      designSize: const Size(750, 1334),
       // allowFontScaling: true,
       builder: (context, child) {
         return MaterialApp(
@@ -44,7 +44,7 @@ class ArcanaEbookReader extends StatelessWidget {
           // builder: EasyLoading.init(),
         );
       },
-      child: Home(),
+      child: const Home(),
     );
   }
 }

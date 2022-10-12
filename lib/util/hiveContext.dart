@@ -9,7 +9,7 @@ class HiveContext {
       await Hive.initFlutter();
       Hive.registerAdapter(BookAdapter(), override: true);
 
-      await this.openBox();
+      await openBox();
       return true;
     } catch (ex) {
       return false;

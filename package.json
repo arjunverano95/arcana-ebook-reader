@@ -8,6 +8,7 @@
     "get:dependencies": "flutter pub get",
     "upgrade:dependencies": "flutter pub upgrade --major-versions",
     "format": "flutter format .",
+    "lint": "dart fix --apply",
     "build:apk": "flutter build apk",
     "build:ios": "flutter build ios",
     "update:splash_screen": "flutter pub pub run flutter_native_splash:create",

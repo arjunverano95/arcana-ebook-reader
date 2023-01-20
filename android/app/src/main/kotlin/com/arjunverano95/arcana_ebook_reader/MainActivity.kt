@@ -1,4 +1,4 @@
-package com.silversoft.arcana_ebook_reader
+package com.arjunverano95.arcana_ebook_reader
 
 import io.flutter.embedding.android.FlutterActivity
 

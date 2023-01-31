@@ -1,6 +1,7 @@
+import 'package:mobx/mobx.dart';
+
 import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/util/bookLibrary.dart';
-import 'package:mobx/mobx.dart';
 
 part 'bookstore.g.dart';
 

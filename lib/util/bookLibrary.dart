@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:flutter/services.dart';
+
+import 'package:epubx/epubx.dart';
+import 'package:image/image.dart';
+
 import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/models/Book.dart';
-import 'package:epubx/epubx.dart';
-import 'package:flutter/services.dart';
-import 'package:image/image.dart';
 
 class BookLibrary {
   static const name = 'books';

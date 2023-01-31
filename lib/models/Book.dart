@@ -1,5 +1,6 @@
-import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:hive/hive.dart';
+
+import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 
 part 'Book.g.dart';
 

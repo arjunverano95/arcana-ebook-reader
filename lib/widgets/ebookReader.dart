@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:epub_viewer/epub_viewer.dart';
 
 import 'package:arcana_ebook_reader/dto/BookDtos.dart';
+import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/bookLibrary.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
-import 'package:epub_viewer/epub_viewer.dart';
-import 'package:arcana_ebook_reader/env.dart';
-import 'dart:io';
 
 Future<void> readEbook(BookDto book) async {
   if (book.fileType == "epub") {
@@ -47,7 +48,7 @@ void _epubViewer(BookDto book) {
   }
 }
 
-  // const pageChannel = const EventChannel('com.jideguru.epub_viewer/page');
-  // pageChannel.receiveBroadcastStream().listen((event) {
-  //   print(event);
-  // });
+// const pageChannel = const EventChannel('com.jideguru.epub_viewer/page');
+// pageChannel.receiveBroadcastStream().listen((event) {
+//   print(event);
+// });

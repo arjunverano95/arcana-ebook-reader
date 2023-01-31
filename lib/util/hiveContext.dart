@@ -1,6 +1,7 @@
+import 'package:hive_flutter/hive_flutter.dart';
+
 import 'package:arcana_ebook_reader/models/Book.dart';
 import 'package:arcana_ebook_reader/util/bookLibrary.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 class HiveContext {
   late Box<Book> books;

@@ -1,7 +1,8 @@
+import 'package:flutter/material.dart';
+
 import 'package:arcana_ebook_reader/screens/favorites.dart';
 import 'package:arcana_ebook_reader/screens/home.dart';
 import 'package:arcana_ebook_reader/screens/library.dart';
-import 'package:flutter/material.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {

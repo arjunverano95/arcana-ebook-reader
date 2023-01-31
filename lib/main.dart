@@ -35,6 +35,7 @@ class ArcanaEbookReader extends StatelessWidget {
       // allowFontScaling: true,
       builder: (context, child) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           navigatorKey: env.navigation.navigatorKey,
           title: 'Arcana Ebook Reader',
           onGenerateRoute: generateRoute,

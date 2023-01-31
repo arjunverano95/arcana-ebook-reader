@@ -1,12 +1,14 @@
 import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
+
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/bookLibrary.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/widgets/ebookReader.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 enum CoverSize { md, lg } //sm, xl
 
@@ -15,22 +17,22 @@ class BookTile extends StatefulWidget {
   final CoverSize size;
   final bool infoOnly;
 
-  BookTile(
-      {required this.book, this.size = CoverSize.md, this.infoOnly = false});
+  const BookTile(
+      {super.key,
+      required this.book,
+      this.size = CoverSize.md,
+      this.infoOnly = false});
 
   @override
-  _BookTileState createState() => _BookTileState();
+  BookTileState createState() => BookTileState();
 }
 
-class _BookTileState extends State<BookTile> {
+class BookTileState extends State<BookTile> {
   @override
   Widget build(BuildContext context) {
     BookDto book = widget.book;
     CoverSize size = widget.size;
     bool infoOnly = widget.infoOnly;
-
-    // if (infoOnly == null) infoOnly = false;
-    // if (size == null) size = CoverSize.md;
 
     double coverWidth = 0;
     double containerHeight = 0;
@@ -40,27 +42,6 @@ class _BookTileState extends State<BookTile> {
     } else if (size == CoverSize.lg) {
       coverWidth = 300.w;
       containerHeight = 410.w;
-      // coverWidth = 169;
-      // coverHeight = 230;
-      // containerHeight = 230;
-    }
-
-    Future<Image> getCoverImage() async {
-      // TODO: Load on background
-      var coverImageData = book.coverImageData;
-      if (coverImageData != null) {
-        return Image.memory(Uint8List.fromList(coverImageData),
-            fit: BoxFit.fitWidth, key: Key("cv_" + book.id));
-      } else {
-        var imgData = await BookLibrary.getCoverImageData(book.filePath);
-        if (imgData != null) {
-          book.coverImageData = imgData;
-          return Image.memory(Uint8List.fromList(imgData),
-              fit: BoxFit.fitWidth, key: Key("cv_" + book.id + "_new"));
-        }
-      }
-      return Image.asset('assets/images/no_cover.jpg',
-          fit: BoxFit.fitWidth, key: Key("cv_none"));
     }
 
     return InkWell(
@@ -73,7 +54,6 @@ class _BookTileState extends State<BookTile> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              // height: coverHeight,
               width: coverWidth,
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -82,30 +62,22 @@ class _BookTileState extends State<BookTile> {
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 1,
                     blurRadius: 3,
-                    offset: Offset(0, 3), // changes position of shadow
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
               child: ClipRect(
-                child: FutureBuilder(
-                  future: getCoverImage(),
-                  builder: (BuildContext context, AsyncSnapshot<Image> image) {
-                    if (image.hasData) {
-                      return image.data!; // image is ready
-                    } else {
-                      return Image.asset(
-                        'assets/images/no_cover.jpg',
-                        fit: BoxFit.fitWidth,
-                        key: Key("cv_loading"),
-                      );
-                    }
-                  },
-                ),
-                //  AnimatedSwitcher(
-                //   duration: const Duration(milliseconds: 500),
-                //   child: null
-                // ),
-              ),
+                  child: Stack(
+                children: <Widget>[
+                  Image.asset('assets/images/no_cover.jpg',
+                      fit: BoxFit.fitWidth, key: const Key("cv_none")),
+                  Image.memory(
+                    Uint8List.fromList(book.coverImageData),
+                    fit: BoxFit.fitWidth,
+                    key: Key("cv_${book.id}"),
+                  ),
+                ],
+              )),
             ),
             Expanded(
               child: Container(
@@ -122,7 +94,7 @@ class _BookTileState extends State<BookTile> {
                           child: Text(
                             (book.title.length < 40)
                                 ? book.title
-                                : book.title.substring(0, 40) + "...",
+                                : "${book.title.substring(0, 40)}...",
                             style: TextStyle(
                                 color: CustomColors.textDark,
                                 fontWeight: FontWeight.bold,
@@ -140,8 +112,8 @@ class _BookTileState extends State<BookTile> {
                             ),
                             onSelected: (String result) {
                               if (result == "Delete") {
-                                BookLibrary.delete(book.id)
-                                    .then((value) => env.bookstore.getBooks());
+                                BookLibrary.delete(book.id).whenComplete(
+                                    () => env.bookstore.getBooks());
                               }
                             },
                             itemBuilder: (BuildContext context) =>
@@ -172,10 +144,7 @@ class _BookTileState extends State<BookTile> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            book.fileType.toUpperCase() +
-                                ", " +
-                                ((book.fileSize / 1000)).toStringAsFixed(1) +
-                                "MB",
+                            "${book.fileType.toUpperCase()}, ${((book.fileSize / 1000000)).toStringAsFixed(1)}MB",
                             style: TextStyle(
                               color: CustomColors.textHighlight,
                               fontSize: 24.sp,
@@ -245,8 +214,8 @@ class _BookTileState extends State<BookTile> {
                                           : CustomColors.normal,
                                       onPressed: () {
                                         BookLibrary.updateFavorite(book.id)
-                                            .then((value) =>
-                                                env.bookstore.getBooks());
+                                            .whenComplete(
+                                                () => env.bookstore.getBooks());
                                         setState(() {
                                           book.isFavorite =
                                               book.isFavorite == 1 ? 0 : 1;
@@ -271,12 +240,3 @@ class _BookTileState extends State<BookTile> {
     );
   }
 }
-
-// void getCoverImage(Map<String, dynamic> context) {
-//   final messenger = HandledIsolate.initialize(context);
-
-//   messenger.listen((filePath) {
-//     BookLibrary.getCoverImageData(filePath)
-//         .then((value) => messenger.send(value));
-//   });
-// }

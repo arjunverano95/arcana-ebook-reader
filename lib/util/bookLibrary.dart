@@ -1,11 +1,13 @@
 import 'dart:io';
-import 'dart:typed_data';
+
+import 'package:flutter/services.dart';
+
+import 'package:epubx/epubx.dart';
+import 'package:image/image.dart';
 
 import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/models/Book.dart';
-import 'package:epubx/epubx.dart';
-import 'package:image/image.dart';
 
 class BookLibrary {
   static const name = 'books';
@@ -13,15 +15,13 @@ class BookLibrary {
     //var books = Hive.box('books');
   }
 
-  static Future<List<int>?> getCoverImageData(String filePath) async {
+  static Future<List<int>> getCoverImageData(String filePath) async {
+    var assetFile = await rootBundle.load('assets/images/no_cover.jpg');
+    var noCoverImage = assetFile.buffer
+        .asUint8List(assetFile.offsetInBytes, assetFile.lengthInBytes);
     try {
       //get cover
-      if (filePath == "") return null;
-
-      // final appDirectory = await getApplicationDocumentsDirectory();
-      // final appDirectoryPath = appDirectory.path;
-      // final imagePath = '$appDirectoryPath/$coverImage';
-      // final imageFile = File(imagePath);
+      if (filePath == "") return noCoverImage.buffer.asUint8List();
       var epubFile = File(filePath);
       Uint8List bytes = await epubFile.readAsBytes();
       EpubBookRef epubBook = await EpubReader.openBook(bytes);
@@ -30,23 +30,15 @@ class BookLibrary {
       if (coverImage != null) {
         List<int> imageBytes = [];
 
-        // ImageObj.Image thumbnail = ImageObj.copyResize(coverImage,
-        //     width: 390.w.toInt(), height: 530.w.toInt());
         Image thumbnail = copyResize(coverImage, width: 195, height: 265);
         imageBytes = encodeJpg(thumbnail);
-        // if (imageBytes == null) imageBytes = encodePng(thumbnail);
-        // if (imageBytes == null) imageBytes = encodeTga(thumbnail);
-        // if (imageBytes == null) imageBytes = encodeGif(thumbnail);
-        // if (imageBytes == null) imageBytes = encodeCur(thumbnail);
-        // if (imageBytes == null) imageBytes = encodeIco(thumbnail);
+        // imageBytes = thumbnail.getBytes();
 
-        // var coverImageData = base64Decode(coverImage);
-        // var image = await imageFile.readAsBytes();
         return imageBytes;
       }
-      return null;
+      return noCoverImage;
     } catch (ex) {
-      return null;
+      return noCoverImage;
     }
   }
 
@@ -58,15 +50,14 @@ class BookLibrary {
       //title already exist
       List<BookDto> bookToAdd =
           books.where((element) => element.title == book.title).toList();
-      if (bookToAdd.length > 0) {
+      if (bookToAdd.isNotEmpty) {
         //Book.delete(book.id);
-        book.title = book.title + "(" + (bookToAdd.length + 1).toString() + ")";
+        book.title = "${book.title}(${bookToAdd.length + 1})";
       }
 
-      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
+      var hiveBox = env.context.books;
       var newBook = Book.fromDto(book);
       await hiveBox.put(newBook.id, newBook);
-      // await hiveBox.close();
 
       return true;
     } catch (ex) {
@@ -76,9 +67,8 @@ class BookLibrary {
 
   static Future<bool> delete(String id) async {
     try {
-      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
+      var hiveBox = env.context.books;
       await hiveBox.delete(id);
-      // await hiveBox.close();
 
       return true;
     } catch (ex) {
@@ -88,10 +78,10 @@ class BookLibrary {
 
   static Future<BookDto?> get(String id) async {
     try {
-      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
+      var hiveBox = env.context.books;
       Book? book = hiveBox.get(id);
-      // await hiveBox.close();
-      if (book != null) return new BookDto.fromBook(book);
+
+      if (book != null) return BookDto.fromBook(book);
       return null;
     } catch (ex) {
       return null;
@@ -100,9 +90,8 @@ class BookLibrary {
 
   static Future<List<BookDto>> getAll() async {
     try {
-      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
-      var library = hiveBox.values.map((e) => new BookDto.fromBook(e)).toList();
-      // await hiveBox.close();
+      var hiveBox = env.context.books;
+      var library = hiveBox.values.map((e) => BookDto.fromBook(e)).toList();
 
       return library;
     } catch (ex) {
@@ -112,7 +101,7 @@ class BookLibrary {
 
   static Future<bool> updateFavorite(String id) async {
     try {
-      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
+      var hiveBox = env.context.books;
       Book? bookToUpdate = hiveBox.get(id);
       if (bookToUpdate != null) {
         //update book
@@ -122,7 +111,6 @@ class BookLibrary {
         return true;
       }
       return false;
-      // await hiveBox.close();
     } catch (ex) {
       return false;
     }
@@ -130,7 +118,7 @@ class BookLibrary {
 
   static Future<bool> updateLastRead(String id) async {
     try {
-      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
+      var hiveBox = env.context.books;
       Book? bookToUpdate = hiveBox.get(id);
       if (bookToUpdate != null) {
         //update book
@@ -139,7 +127,7 @@ class BookLibrary {
 
         return true;
       }
-      // await hiveBox.close();
+
       return false;
     } catch (ex) {
       return false;
@@ -148,7 +136,7 @@ class BookLibrary {
 
   static Future<bool> updateLastReadLocator(String id, String locator) async {
     try {
-      var hiveBox = env.context.books; // Hive.box<Book>(BookLibrary.name);
+      var hiveBox = env.context.books;
       Book? bookToUpdate = hiveBox.get(id);
       if (bookToUpdate != null) {
         //update book
@@ -157,17 +145,10 @@ class BookLibrary {
 
         return true;
       }
-      // await hiveBox.close();
+
       return false;
     } catch (ex) {
       return false;
     }
   }
-
-  // Future<List<int>> getCoverImageData() async {
-  //   if (this.coverImageData == null)
-  //     this.coverImageData = await _getCoverImageData(this.filePath);
-  //   return this.coverImageData;
-  // }
-
 }

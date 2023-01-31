@@ -1,6 +1,7 @@
+import 'package:hive_flutter/hive_flutter.dart';
+
 import 'package:arcana_ebook_reader/models/Book.dart';
 import 'package:arcana_ebook_reader/util/bookLibrary.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 class HiveContext {
   late Box<Book> books;
@@ -9,7 +10,7 @@ class HiveContext {
       await Hive.initFlutter();
       Hive.registerAdapter(BookAdapter(), override: true);
 
-      await this.openBox();
+      await openBox();
       return true;
     } catch (ex) {
       return false;

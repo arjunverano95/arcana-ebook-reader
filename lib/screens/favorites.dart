@@ -1,22 +1,24 @@
-import 'package:arcana_ebook_reader/dto/BookDtos.dart';
-import 'package:arcana_ebook_reader/env.dart';
-import 'package:arcana_ebook_reader/util/customColors.dart';
-import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
+import 'package:arcana_ebook_reader/dto/BookDtos.dart';
+import 'package:arcana_ebook_reader/env.dart';
+import 'package:arcana_ebook_reader/util/customColors.dart';
+import 'package:arcana_ebook_reader/widgets/bookTile.dart';
+
 class Favorites extends StatelessWidget {
-  Favorites();
+  const Favorites({super.key});
   @override
   Widget build(BuildContext context) {
-    return FavoritesBody();
+    return const FavoritesBody();
   }
 }
 
 class FavoritesBody extends StatefulWidget {
-  FavoritesBody();
+  const FavoritesBody({super.key});
   @override
   FavoritesBodyState createState() => FavoritesBodyState();
 }
@@ -37,12 +39,13 @@ class FavoritesBodyState extends State<FavoritesBody> {
 
   Widget _listBooks() {
     List<BookDto> books = List.from(env.bookstore.books);
-    if (books.length > 0)
+    if (books.isNotEmpty) {
       books = books.where((a) => a.isFavorite == 1).toList();
+    }
 
     if (_sort == "asc") books.sort((a, b) => a.title.compareTo(b.title));
     if (_sort == "desc") books.sort((a, b) => b.title.compareTo(a.title));
-    if (books.length > 0) {
+    if (books.isNotEmpty) {
       return ListView.builder(
           shrinkWrap: true,
           primary: false,
@@ -94,7 +97,7 @@ class FavoritesBodyState extends State<FavoritesBody> {
         body: SingleChildScrollView(
           padding: EdgeInsets.all(30.sp),
           child: ConstrainedBox(
-            constraints: BoxConstraints(),
+            constraints: const BoxConstraints(),
             child: Column(children: [
               Observer(
                 builder: (_) => _listBooks(),

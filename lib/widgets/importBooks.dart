@@ -1,14 +1,15 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:arcana_ebook_reader/dto/BookDtos.dart';
-import 'package:arcana_ebook_reader/env.dart';
-import 'package:arcana_ebook_reader/util/bookLibrary.dart';
-import 'package:arcana_ebook_reader/widgets/ebookReader.dart';
 import 'package:epubx/epubx.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:uuid/uuid.dart';
+
+import 'package:arcana_ebook_reader/dto/BookDtos.dart';
+import 'package:arcana_ebook_reader/env.dart';
+import 'package:arcana_ebook_reader/util/bookLibrary.dart';
+import 'package:arcana_ebook_reader/widgets/ebookReader.dart';
 
 Future<void> showImportDialog() async {
   if (await Permission.storage.request().isGranted) {
@@ -18,62 +19,51 @@ Future<void> showImportDialog() async {
       allowedExtensions: ['epub'],
     );
 
-    if (result != null) {
-      if (result.files.length > 0) {
-        var books = await _importBooks(result.files);
-        env.bookstore.getBooks();
-        if (books.length == 1) readEbook(books[0]);
+    if (result!.files.isNotEmpty) {
+      // var toRead = await flutterCompute(_importBooks, result.files);
+      if (result.files.length == 1) {
+        var file = result.files[0];
+        var toRead = await _importBook(file)
+            .whenComplete(() => env.bookstore.getBooks());
+
+        if (toRead != null) {
+          var book = await BookLibrary.get(toRead);
+          if (book != null) readEbook(book);
+        }
+      } else {
+        await Future.wait(result.files.map((file) async {
+          await _importBook(file);
+        })).whenComplete(() => env.bookstore.getBooks());
       }
     }
   }
 }
 
-// This function happens in the isolate.
-// void importBooks(Map<String, dynamic> context) {
-//   final messenger = HandledIsolate.initialize(context);
+Future<String?> _importBook(PlatformFile file) async {
+  String filePath = file.path ?? '';
+  int fileSize = file.size;
+  String fileExt = file.extension ?? ''.toLowerCase();
+  if (fileExt == "epub") {
+    String uKey = const Uuid().v1();
+    var epubFile = File(filePath);
+    Uint8List bytes = await epubFile.readAsBytes();
 
-//   messenger.listen((message) async {
-//     var files = (json.decode(message) as List)
-//         .map((e) => {
-//               "path": e.path.toString(),
-//               "extension": e.extension.toString(),
-//             })
-//         .toList();
-//     bool value = await _importBooks(files);
-//     messenger.send(value);
-//   });
-// }
+    EpubBookRef epubBook = await EpubReader.openBook(bytes);
 
-Future<List<BookDto>> _importBooks(List<PlatformFile> files) async {
-  List<BookDto> res = [];
-  for (var i = 0; i < files.length; i++) {
-    PlatformFile file = files[i];
+    BookDto newBook = BookDto();
+    newBook.id = uKey;
+    newBook.title = epubBook.Title ?? '';
+    newBook.author = epubBook.Author ?? '';
+    newBook.addedDate = DateTime.now();
+    // newBook.lastRead = DateTime.now();
+    newBook.isFavorite = 0;
 
-    String filePath = file.path ?? '';
-    int fileSize = file.size;
-    String fileExt = file.extension ?? ''.toLowerCase();
-    if (fileExt == "epub") {
-      String uKey = Uuid().v1();
-      var epubFile = File(filePath);
-      Uint8List bytes = await epubFile.readAsBytes();
-
-      EpubBookRef epubBook = await EpubReader.openBook(bytes);
-
-      BookDto newBook = BookDto();
-      newBook.id = uKey;
-      newBook.title = epubBook.Title ?? '';
-      newBook.author = epubBook.Author ?? '';
-      newBook.addedDate = DateTime.now();
-      // newBook.lastRead = DateTime.now();
-      newBook.isFavorite = 0;
-
-      newBook.filePath = filePath;
-      newBook.fileSize = fileSize;
-      newBook.fileType = fileExt;
-      // await BookDto.add(newBook, fileExt, fileSize, bytes, imageBytes);
-      await BookLibrary.add(newBook);
-      res.add(newBook);
-    }
+    newBook.filePath = filePath;
+    newBook.fileSize = fileSize;
+    newBook.fileType = fileExt;
+    newBook.coverImageData = await BookLibrary.getCoverImageData(filePath);
+    await BookLibrary.add(newBook);
+    return newBook.id;
   }
-  return res;
+  return null;
 }

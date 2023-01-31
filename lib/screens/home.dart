@@ -1,27 +1,29 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+
 import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
+import 'package:arcana_ebook_reader/extension.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:arcana_ebook_reader/widgets/importBooks.dart';
 import 'package:arcana_ebook_reader/widgets/loading_overlay.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:arcana_ebook_reader/extension.dart';
 
 class Home extends StatelessWidget {
-  Home();
+  const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return HomeBody();
+    return const HomeBody();
   }
 }
 
 class HomeBody extends StatefulWidget {
-  HomeBody();
+  const HomeBody({super.key});
   @override
   HomeBodyState createState() => HomeBodyState();
 }
@@ -37,7 +39,7 @@ class HomeBodyState extends State<HomeBody>
     super.initState();
     _recentReadAnimationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
     );
 
     _recentReadAnimation = Tween(
@@ -55,11 +57,11 @@ class HomeBodyState extends State<HomeBody>
 
   Widget _recentRead() {
     BookDto? recentRead;
-    if (env.bookstore.books.length > 0) {
+    if (env.bookstore.books.isNotEmpty) {
       List<BookDto> recentReads =
           List.from(env.bookstore.books.where((item) => item.lastRead != null));
 
-      if (recentReads.length > 0) {
+      if (recentReads.isNotEmpty) {
         recentReads.sort((a, b) => b.lastRead.compareToWithNull(a.lastRead));
         recentRead = recentReads[0];
       }
@@ -74,13 +76,13 @@ class HomeBodyState extends State<HomeBody>
 
   Widget _recentAdded() {
     List<BookDto> recentAdded = [];
-    if (env.bookstore.books.length > 0) {
+    if (env.bookstore.books.isNotEmpty) {
       recentAdded = List.from(env.bookstore.books);
       recentAdded.sort((a, b) => b.addedDate.compareTo(a.addedDate));
       recentAdded = recentAdded.take(7).toList();
     }
 
-    if (recentAdded.length > 0) {
+    if (recentAdded.isNotEmpty) {
       return ListView.builder(
           shrinkWrap: true,
           primary: false,
@@ -97,7 +99,6 @@ class HomeBodyState extends State<HomeBody>
                 ),
               ),
             );
-            // return _buildRows(recentAdded[i], i);
           });
     } else {
       return Container();
@@ -116,11 +117,14 @@ class HomeBodyState extends State<HomeBody>
             padding: EdgeInsets.all(0.sp),
             children: <Widget>[
               DrawerHeader(
+                decoration: BoxDecoration(
+                  color: CustomColors.normal,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Container(
+                    SizedBox(
                       height: 140.w,
                       width: 140.w,
                       child: Image.asset(
@@ -132,9 +136,6 @@ class HomeBodyState extends State<HomeBody>
                       style: TextStyle(color: Colors.white, fontSize: 30.sp),
                     ),
                   ],
-                ),
-                decoration: BoxDecoration(
-                  color: CustomColors.normal,
                 ),
               ),
               ListTile(
@@ -190,14 +191,12 @@ class HomeBodyState extends State<HomeBody>
         body: SingleChildScrollView(
           padding: EdgeInsets.all(30.sp),
           child: ConstrainedBox(
-            constraints: BoxConstraints(),
+            constraints: const BoxConstraints(),
             child: Column(children: <Widget>[
-              Container(
-                child: Observer(
-                  builder: (_) => FadeTransition(
-                    opacity: _recentReadAnimation,
-                    child: _recentRead(),
-                  ),
+              Observer(
+                builder: (_) => FadeTransition(
+                  opacity: _recentReadAnimation,
+                  child: _recentRead(),
                 ),
               ),
               Container(
@@ -229,7 +228,7 @@ class HomeBodyState extends State<HomeBody>
               ),
               Observer(
                 builder: (_) => Container(
-                  decoration: (env.bookstore.books.length > 0)
+                  decoration: (env.bookstore.books.isNotEmpty)
                       ? BoxDecoration(
                           border: Border(
                             top: BorderSide(

@@ -1,24 +1,26 @@
+import 'package:flutter/material.dart';
+
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+
 import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:arcana_ebook_reader/widgets/importBooks.dart';
 import 'package:arcana_ebook_reader/widgets/loading_overlay.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class Library extends StatelessWidget {
-  Library();
+  const Library({super.key});
   @override
   Widget build(BuildContext context) {
-    return LibraryBody();
+    return const LibraryBody();
   }
 }
 
 class LibraryBody extends StatefulWidget {
-  LibraryBody();
+  const LibraryBody({super.key});
   @override
   LibraryBodyState createState() => LibraryBodyState();
 }
@@ -42,7 +44,7 @@ class LibraryBodyState extends State<LibraryBody> {
     if (_sort == "asc") books.sort((a, b) => a.title.compareTo(b.title));
     if (_sort == "desc") books.sort((a, b) => b.title.compareTo(a.title));
 
-    if (books.length > 0) {
+    if (books.isNotEmpty) {
       return ListView.builder(
           shrinkWrap: true,
           primary: false,
@@ -78,11 +80,14 @@ class LibraryBodyState extends State<LibraryBody> {
             padding: EdgeInsets.all(0.sp),
             children: <Widget>[
               DrawerHeader(
+                decoration: BoxDecoration(
+                  color: CustomColors.normal,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Container(
+                    SizedBox(
                       height: 140.w,
                       width: 140.w,
                       child: Image.asset(
@@ -94,9 +99,6 @@ class LibraryBodyState extends State<LibraryBody> {
                       style: TextStyle(color: Colors.white, fontSize: 30.sp),
                     ),
                   ],
-                ),
-                decoration: BoxDecoration(
-                  color: CustomColors.normal,
                 ),
               ),
               ListTile(
@@ -155,7 +157,7 @@ class LibraryBodyState extends State<LibraryBody> {
         body: SingleChildScrollView(
           padding: EdgeInsets.all(30.sp),
           child: ConstrainedBox(
-            constraints: BoxConstraints(),
+            constraints: const BoxConstraints(),
             child: Column(children: [
               Observer(
                 builder: (_) => _listBooks(),

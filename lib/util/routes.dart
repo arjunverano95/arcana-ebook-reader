@@ -8,23 +8,26 @@ Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
     case 'home':
       return MaterialPageRoute(
-          settings: settings, builder: (context) => const Home());
+        settings: settings,
+        builder: (context) => const Home(),
+      );
 
     case 'favorites':
       return MaterialPageRoute(
-          settings: settings, builder: (context) => const Favorites());
+        settings: settings,
+        builder: (context) => const Favorites(),
+      );
 
     case 'library':
+      final String? searchQuery = settings.arguments as String?;
       return MaterialPageRoute(
-          settings: settings, builder: (context) => const Library());
+        settings: settings,
+        builder: (context) => Library(initialSearchQuery: searchQuery),
+      );
     default:
       return MaterialPageRoute(
         builder: (context) => const SafeArea(
-          child: Scaffold(
-            body: Center(
-              child: Text('Error Loading Screen'),
-            ),
-          ),
+          child: Scaffold(body: Center(child: Text('Error Loading Screen'))),
         ),
       );
   }

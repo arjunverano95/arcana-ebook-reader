@@ -10,7 +10,7 @@ import 'package:arcana_ebook_reader/util/bookLibrary.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/widgets/ebookReader.dart';
 
-enum CoverSize { md, lg } //sm, xl
+enum CoverSize { md, lg }
 
 class BookTile extends StatefulWidget {
   final BookDto book;
@@ -35,215 +35,428 @@ class BookTileState extends State<BookTile> {
     CoverSize size = widget.size;
     bool infoOnly = widget.infoOnly;
 
-    double coverWidth = 0;
-    double containerHeight = 0;
-    if (size == CoverSize.md) {
-      coverWidth = 220.w;
-      containerHeight = 290.w;
-    } else if (size == CoverSize.lg) {
-      coverWidth = 300.w;
-      containerHeight = 410.w;
+    if (size == CoverSize.lg) {
+      return _buildLargeCard(book, infoOnly);
+    } else {
+      return _buildCompactCard(book, infoOnly);
     }
+  }
 
+  Widget _buildLargeCard(BookDto book, bool infoOnly) {
     return InkWell(
       onTap: () => readEbook(book),
+      borderRadius: BorderRadius.circular(16.r),
       child: Container(
-        padding: EdgeInsets.all(30.sp),
-        margin: EdgeInsets.only(bottom: 30.sp),
-        color: Colors.white,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+        margin: EdgeInsets.only(bottom: 16.h),
+        decoration: BoxDecoration(
+          color: CustomColors.cardBackground,
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: CustomColors.cardShadow,
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header with continue reading label
             Container(
-              width: coverWidth,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.5),
-                    spreadRadius: 1,
-                    blurRadius: 3,
-                    offset: const Offset(0, 3),
+              padding: EdgeInsets.all(16.w),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.auto_stories_rounded,
+                    color: CustomColors.primary,
+                    size: 20.sp,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    'Continue Reading',
+                    style: TextStyle(
+                      color: CustomColors.primary,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
-              child: ClipRect(
-                child: Stack(
-                  children: <Widget>[
-                    Image.asset(
-                      'assets/images/no_cover.jpg',
-                      fit: BoxFit.fitWidth,
-                      key: const Key("cv_none"),
+            ),
+            // Main content
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Book cover
+                  _buildBookCover(book, 120.w, 160.w),
+                  SizedBox(width: 16.w),
+                  // Book info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          book.title,
+                          style: TextStyle(
+                            color: CustomColors.textPrimary,
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          book.author,
+                          style: TextStyle(
+                            color: CustomColors.textSecondary,
+                            fontSize: 14.sp,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 8.h),
+                        _buildFileInfo(book),
+                        SizedBox(height: 12.h),
+                        // Progress indicator (placeholder for now)
+                        _buildProgressIndicator(),
+                      ],
                     ),
-                    if (book.coverImageData.isNotEmpty)
-                      Image.memory(
-                        Uint8List.fromList(book.coverImageData),
-                        fit: BoxFit.fitWidth,
-                        key: Key("cv_${book.id}"),
-                      ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            Expanded(
-              child: Container(
-                height: containerHeight,
-                padding: EdgeInsets.only(left: 30.sp),
+            SizedBox(height: 16.h),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompactCard(BookDto book, bool infoOnly) {
+    return InkWell(
+      onTap: () => readEbook(book),
+      borderRadius: BorderRadius.circular(12.r),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 12.h),
+        decoration: BoxDecoration(
+          color: CustomColors.cardBackground,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: CustomColors.divider, width: 1),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(16.w),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Book cover
+              _buildBookCover(book, 60.w, 80.w),
+              SizedBox(width: 16.w),
+              // Book info
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Text(
-                            (book.title.length < 40)
-                                ? book.title
-                                : "${book.title.substring(0, 40)}...",
-                            style: TextStyle(
-                              color: CustomColors.textDark,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 30.sp,
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                book.title,
+                                style: TextStyle(
+                                  color: CustomColors.textPrimary,
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: 4.h),
+                              Text(
+                                book.author,
+                                style: TextStyle(
+                                  color: CustomColors.textSecondary,
+                                  fontSize: 14.sp,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
                         ),
-                        SizedBox(
-                          height: 50.w,
-                          width: 50.w,
-                          child: PopupMenuButton<String>(
-                            padding: EdgeInsets.all(0.sp),
-                            icon: Icon(Icons.more_vert, size: 40.sp),
-                            onSelected: (String result) {
-                              if (result == "Delete") {
-                                BookLibrary.delete(
-                                  book.id,
-                                ).whenComplete(() => env.bookstore.getBooks());
-                              }
-                            },
-                            itemBuilder: (BuildContext context) =>
-                                <PopupMenuEntry<String>>[
-                                  PopupMenuItem<String>(
-                                    value: "Delete",
-                                    child: Text(
-                                      'Delete',
-                                      style: TextStyle(
-                                        color: CustomColors.textNormal,
-                                        fontSize: 28.sp,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                          ),
-                        ),
+                        _buildPopupMenu(book),
                       ],
                     ),
-                    Text(
-                      book.author,
-                      style: TextStyle(
-                        color: CustomColors.textGray,
-                        fontSize: 25.sp,
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            "${book.fileType.toUpperCase()}, ${((book.fileSize / 1000000)).toStringAsFixed(1)}MB",
-                            style: TextStyle(
-                              color: CustomColors.textHighlight,
-                              fontSize: 24.sp,
-                            ),
-                          ),
-                          Visibility(
-                            visible: !infoOnly,
-                            child: Container(
-                              padding: EdgeInsets.only(top: 10.sp),
-                              margin: EdgeInsets.only(top: 10.sp),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  top: BorderSide(
-                                    width: 1,
-                                    color: CustomColors.normal,
-                                    style: BorderStyle.solid,
-                                  ),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    height: 52.w,
-                                    width: 52.w,
-                                    child: IconButton(
-                                      padding: EdgeInsets.all(0.sp),
-                                      icon: Icon(
-                                        Icons.format_list_bulleted,
-                                        size: 44.sp,
-                                      ),
-                                      color: CustomColors.normal,
-                                      onPressed: () {},
-                                    ),
-                                  ),
-                                  Container(width: 20.w),
-                                  SizedBox(
-                                    height: 52.w,
-                                    width: 52.w,
-                                    child: IconButton(
-                                      padding: EdgeInsets.all(0.sp),
-                                      icon: Icon(
-                                        Icons.bookmark_border,
-                                        size: 44.sp,
-                                      ),
-                                      color: CustomColors.normal,
-                                      onPressed: () {},
-                                    ),
-                                  ),
-                                  Container(width: 20.w),
-                                  SizedBox(
-                                    height: 52.w,
-                                    width: 52.w,
-                                    child: IconButton(
-                                      padding: EdgeInsets.all(0.sp),
-                                      icon: Icon(
-                                        book.isFavorite == 1
-                                            ? Icons.favorite
-                                            : Icons.favorite_border,
-                                        size: 44.sp,
-                                      ),
-                                      color: book.isFavorite == 1
-                                          ? Colors.red
-                                          : CustomColors.normal,
-                                      onPressed: () {
-                                        BookLibrary.updateFavorite(
-                                          book.id,
-                                        ).whenComplete(
-                                          () => env.bookstore.getBooks(),
-                                        );
-                                        setState(() {
-                                          book.isFavorite = book.isFavorite == 1
-                                              ? 0
-                                              : 1;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    SizedBox(height: 8.h),
+                    _buildFileInfo(book),
+                    if (!infoOnly) ...[
+                      SizedBox(height: 12.h),
+                      _buildActionButtons(book),
+                    ],
                   ],
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBookCover(BookDto book, double width, double height) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.r),
+        boxShadow: [
+          BoxShadow(
+            color: CustomColors.blackWithOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8.r),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Default cover
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    CustomColors.primaryWithOpacity(0.8),
+                    CustomColors.primaryDark,
+                  ],
+                ),
+              ),
+              child: Icon(
+                Icons.auto_stories_rounded,
+                color: CustomColors.textOnPrimaryWithOpacity(0.5),
+                size: width * 0.4,
+              ),
             ),
+            // Actual cover if available
+            if (book.coverImageData.isNotEmpty)
+              Image.memory(
+                Uint8List.fromList(book.coverImageData),
+                fit: BoxFit.cover,
+                key: Key("cv_${book.id}"),
+              ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildFileInfo(BookDto book) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: CustomColors.backgroundSecondary,
+        borderRadius: BorderRadius.circular(6.r),
+      ),
+      child: Text(
+        "${book.fileType.toUpperCase()} • ${((book.fileSize / 1000000)).toStringAsFixed(1)}MB",
+        style: TextStyle(
+          color: CustomColors.textSecondary,
+          fontSize: 12.sp,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProgressIndicator() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Progress',
+          style: TextStyle(
+            color: CustomColors.textSecondary,
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        SizedBox(height: 4.h),
+        Container(
+          height: 4.h,
+          decoration: BoxDecoration(
+            color: CustomColors.backgroundSecondary,
+            borderRadius: BorderRadius.circular(2.r),
+          ),
+          child: FractionallySizedBox(
+            alignment: Alignment.centerLeft,
+            widthFactor: 0.3, // Placeholder - would be actual progress
+            child: Container(
+              decoration: BoxDecoration(
+                color: CustomColors.primary,
+                borderRadius: BorderRadius.circular(2.r),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 4.h),
+        Text(
+          '30% complete', // Placeholder
+          style: TextStyle(color: CustomColors.textSecondary, fontSize: 10.sp),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButtons(BookDto book) {
+    return Row(
+      children: [
+        _buildActionButton(
+          icon: Icons.list_rounded,
+          onPressed: () {
+            // TODO: Show table of contents
+          },
+        ),
+        SizedBox(width: 12.w),
+        _buildActionButton(
+          icon: Icons.bookmark_outline_rounded,
+          onPressed: () {
+            // TODO: Show bookmarks
+          },
+        ),
+        SizedBox(width: 12.w),
+        _buildActionButton(
+          icon: book.isFavorite == 1
+              ? Icons.favorite_rounded
+              : Icons.favorite_outline_rounded,
+          color: book.isFavorite == 1 ? CustomColors.error : null,
+          onPressed: () {
+            BookLibrary.updateFavorite(
+              book.id,
+            ).whenComplete(() => env.bookstore.getBooks());
+            setState(() {
+              book.isFavorite = book.isFavorite == 1 ? 0 : 1;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+    Color? color,
+  }) {
+    return Container(
+      width: 36.w,
+      height: 36.w,
+      decoration: BoxDecoration(
+        color: CustomColors.dynamicWithOpacity(color, 0.1),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: IconButton(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 18.sp, color: color ?? CustomColors.primary),
+        padding: EdgeInsets.zero,
+      ),
+    );
+  }
+
+  Widget _buildPopupMenu(BookDto book) {
+    return PopupMenuButton<String>(
+      icon: Icon(
+        Icons.more_vert_rounded,
+        size: 20.sp,
+        color: CustomColors.textSecondary,
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      onSelected: (String result) {
+        if (result == "Delete") {
+          _showDeleteConfirmation(book);
+        }
+      },
+      itemBuilder: (BuildContext context) => [
+        PopupMenuItem<String>(
+          value: "Delete",
+          child: Row(
+            children: [
+              Icon(
+                Icons.delete_outline_rounded,
+                size: 18.sp,
+                color: CustomColors.error,
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                'Delete',
+                style: TextStyle(color: CustomColors.error, fontSize: 14.sp),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showDeleteConfirmation(BookDto book) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: CustomColors.cardBackground,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          title: Text(
+            'Delete Book',
+            style: TextStyle(
+              color: CustomColors.textPrimary,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to delete "${book.title}"? This action cannot be undone.',
+            style: TextStyle(
+              color: CustomColors.textSecondary,
+              fontSize: 14.sp,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: CustomColors.textSecondary,
+                  fontSize: 14.sp,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                BookLibrary.delete(
+                  book.id,
+                ).whenComplete(() => env.bookstore.getBooks());
+                Navigator.of(context).pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: CustomColors.error,
+                foregroundColor: CustomColors.textOnPrimary,
+              ),
+              child: Text('Delete', style: TextStyle(fontSize: 14.sp)),
+            ),
+          ],
+        );
+      },
     );
   }
 }

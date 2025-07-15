@@ -11,9 +11,10 @@ class LoadingOverlay {
 
   void show() {
     showDialog(
-        context: _context,
-        barrierDismissible: false,
-        builder: (_) => _FullScreenLoader());
+      context: _context,
+      barrierDismissible: false,
+      builder: (_) => _FullScreenLoader(),
+    );
   }
 
   Future<T> during<T>(Future<T> future) {
@@ -35,19 +36,16 @@ class _FullScreenLoader extends StatelessWidget {
       decoration: const BoxDecoration(color: Color.fromRGBO(0, 0, 0, 0.2)),
       child: Center(
         child: Container(
-          padding: EdgeInsets.all(
-            5.sp,
-          ),
+          padding: EdgeInsets.all(5.sp),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.all(
-              Radius.circular(5.sp),
-            ),
+            borderRadius: BorderRadius.all(Radius.circular(5.sp)),
           ),
           child: Image.asset(
-            'assets/images/loading.gif',
-            fit: BoxFit.fitWidth,
-            width: 120.sp,
+            'assets/images/arcana_ebook_reader.png',
+            fit: BoxFit.contain,
+            width: 80.sp,
+            height: 80.sp,
           ),
         ),
       ),

@@ -40,10 +40,80 @@ class ArcanaEbookReader extends StatelessWidget {
           title: 'Arcana Ebook Reader',
           onGenerateRoute: generateRoute,
           theme: ThemeData(
-              primaryColor: CustomColors.normal,
-              appBarTheme: AppBarTheme(
-                color: CustomColors.normal, //<-- SEE HERE
-              )),
+            useMaterial3: true,
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: CustomColors.primary,
+              brightness: Brightness.light,
+            ),
+            appBarTheme: AppBarTheme(
+              backgroundColor: CustomColors.primary,
+              foregroundColor: CustomColors.textOnPrimary,
+              elevation: 0,
+              centerTitle: false,
+              titleTextStyle: TextStyle(
+                color: CustomColors.textOnPrimary,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            cardTheme: CardThemeData(
+              color: CustomColors.cardBackground,
+              elevation: 2,
+              shadowColor: CustomColors.cardShadow,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: CustomColors.primary,
+                foregroundColor: CustomColors.textOnPrimary,
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+              ),
+            ),
+            textTheme: const TextTheme(
+              headlineLarge: TextStyle(
+                color: CustomColors.textPrimary,
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+              ),
+              headlineMedium: TextStyle(
+                color: CustomColors.textPrimary,
+                fontSize: 28,
+                fontWeight: FontWeight.w600,
+              ),
+              titleLarge: TextStyle(
+                color: CustomColors.textPrimary,
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+              ),
+              titleMedium: TextStyle(
+                color: CustomColors.textPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+              bodyLarge: TextStyle(
+                color: CustomColors.textPrimary,
+                fontSize: 16,
+              ),
+              bodyMedium: TextStyle(
+                color: CustomColors.textSecondary,
+                fontSize: 14,
+              ),
+              labelLarge: TextStyle(
+                color: CustomColors.textSecondary,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
           home: child,
           // builder: EasyLoading.init(),
         );

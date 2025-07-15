@@ -39,6 +39,7 @@ update-splash-screen:
 	dart pub run flutter_native_splash:create
 
 ########################### Code Generation ###########################
+# Generates code for Drift (database) and MobX (stores)
 update-stores:
 	flutter packages pub run build_runner build --delete-conflicting-outputs
 

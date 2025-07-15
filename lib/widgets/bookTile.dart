@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
-import 'package:arcana_ebook_reader/util/bookLibrary.dart';
+import 'package:arcana_ebook_reader/models/Book.dart';
+import 'package:arcana_ebook_reader/services/database_service.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/widgets/ebookReader.dart';
 
 enum CoverSize { md, lg }
 
 class BookTile extends StatefulWidget {
-  final BookDto book;
+  final Book book;
   final CoverSize size;
   final bool infoOnly;
 
@@ -31,7 +31,7 @@ class BookTile extends StatefulWidget {
 class BookTileState extends State<BookTile> {
   @override
   Widget build(BuildContext context) {
-    BookDto book = widget.book;
+    Book book = widget.book;
     CoverSize size = widget.size;
     bool infoOnly = widget.infoOnly;
 
@@ -42,7 +42,7 @@ class BookTileState extends State<BookTile> {
     }
   }
 
-  Widget _buildLargeCard(BookDto book, bool infoOnly) {
+  Widget _buildLargeCard(Book book, bool infoOnly) {
     return InkWell(
       onTap: () => readEbook(book),
       borderRadius: BorderRadius.circular(16.r),
@@ -136,7 +136,7 @@ class BookTileState extends State<BookTile> {
     );
   }
 
-  Widget _buildCompactCard(BookDto book, bool infoOnly) {
+  Widget _buildCompactCard(Book book, bool infoOnly) {
     return InkWell(
       onTap: () => readEbook(book),
       borderRadius: BorderRadius.circular(12.r),
@@ -209,7 +209,7 @@ class BookTileState extends State<BookTile> {
     );
   }
 
-  Widget _buildBookCover(BookDto book, double width, double height) {
+  Widget _buildBookCover(Book book, double width, double height) {
     return Container(
       width: width,
       height: height,
@@ -259,7 +259,7 @@ class BookTileState extends State<BookTile> {
     );
   }
 
-  Widget _buildFileInfo(BookDto book) {
+  Widget _buildFileInfo(Book book) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
@@ -316,7 +316,7 @@ class BookTileState extends State<BookTile> {
     );
   }
 
-  Widget _buildActionButtons(BookDto book) {
+  Widget _buildActionButtons(Book book) {
     return Row(
       children: [
         _buildActionButton(
@@ -339,11 +339,12 @@ class BookTileState extends State<BookTile> {
               : Icons.favorite_outline_rounded,
           color: book.isFavorite == 1 ? CustomColors.error : null,
           onPressed: () {
-            BookLibrary.updateFavorite(
+            DatabaseService.updateFavorite(
               book.id,
             ).whenComplete(() => env.bookstore.getBooks());
             setState(() {
-              book.isFavorite = book.isFavorite == 1 ? 0 : 1;
+              // The book object is immutable, so we need to rebuild the widget
+              // The state will be updated when the store refreshes
             });
           },
         ),
@@ -371,7 +372,7 @@ class BookTileState extends State<BookTile> {
     );
   }
 
-  Widget _buildPopupMenu(BookDto book) {
+  Widget _buildPopupMenu(Book book) {
     return PopupMenuButton<String>(
       icon: Icon(
         Icons.more_vert_rounded,
@@ -406,7 +407,7 @@ class BookTileState extends State<BookTile> {
     );
   }
 
-  void _showDeleteConfirmation(BookDto book) {
+  void _showDeleteConfirmation(Book book) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -443,7 +444,7 @@ class BookTileState extends State<BookTile> {
             ),
             ElevatedButton(
               onPressed: () {
-                BookLibrary.delete(
+                DatabaseService.deleteBook(
                   book.id,
                 ).whenComplete(() => env.bookstore.getBooks());
                 Navigator.of(context).pop();

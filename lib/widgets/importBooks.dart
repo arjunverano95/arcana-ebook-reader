@@ -1,17 +1,18 @@
-import 'dart:io';
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+
+import 'package:archive/archive.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:uuid/uuid.dart';
-import 'package:archive/archive.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
-import 'package:arcana_ebook_reader/util/bookLibrary.dart';
+import 'package:arcana_ebook_reader/models/Book.dart';
+import 'package:arcana_ebook_reader/services/database_service.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/widgets/ebookReader.dart';
 
@@ -31,7 +32,7 @@ Future<void> showImportDialog() async {
         ).whenComplete(() => env.bookstore.getBooks());
 
         if (toRead != null) {
-          var book = await BookLibrary.get(toRead);
+          var book = await DatabaseService.getBook(toRead);
           if (book != null) readEbook(book);
         }
       } else {
@@ -615,24 +616,32 @@ Future<String?> _importBook(PlatformFile file) async {
 
       String uKey = const Uuid().v1();
 
-      BookDto newBook = BookDto();
-      newBook.id = uKey;
-      newBook.title = metadata?.title ?? file.name.replaceAll('.epub', '');
-      newBook.author = metadata?.author ?? 'Unknown Author';
-      newBook.addedDate = DateTime.now();
-      newBook.isFavorite = 0;
-      newBook.filePath = filePath;
-      newBook.fileSize = fileSize;
-      newBook.fileType = fileExt;
+      Book newBook = Book(
+        id: uKey,
+        title: metadata?.title ?? file.name.replaceAll('.epub', ''),
+        author: metadata?.author ?? 'Unknown Author',
+        lastRead: null,
+        addedDate: DateTime.now(),
+        isFavorite: 0,
+        filePath: filePath,
+        fileType: fileExt,
+        fileSize: fileSize,
+        lastReadLocator: '',
+        coverImageData:
+            metadata?.coverData ??
+            await DatabaseService.getCoverImageData(filePath),
+        totalPages: null,
+        currentPage: null,
+        progressPercent: null,
+        description: null,
+        isbn: null,
+        publisher: null,
+        publishDate: null,
+        language: null,
+        readingTime: null,
+      );
 
-      // Use extracted cover or default
-      if (metadata?.coverData != null) {
-        newBook.coverImageData = metadata!.coverData!;
-      } else {
-        newBook.coverImageData = await BookLibrary.getCoverImageData(filePath);
-      }
-
-      await BookLibrary.add(newBook);
+      await DatabaseService.addBook(newBook);
       return newBook.id;
     } catch (e) {
       developer.log('Error importing EPUB: $e');

@@ -15,7 +15,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case 'favorites':
       return MaterialPageRoute(
         settings: settings,
-        builder: (context) => const Favorites(),
+        builder: (context) => const FavoritesScreen(),
       );
 
     case 'library':

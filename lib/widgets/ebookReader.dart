@@ -3,22 +3,22 @@ import 'dart:io';
 
 import 'package:vocsy_epub_viewer/epub_viewer.dart';
 
-import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
-import 'package:arcana_ebook_reader/util/bookLibrary.dart';
+import 'package:arcana_ebook_reader/models/Book.dart';
+import 'package:arcana_ebook_reader/services/database_service.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 
-Future<void> readEbook(BookDto book) async {
+Future<void> readEbook(Book book) async {
   if (book.fileType == "epub") {
     _epubViewer(book);
   }
 
-  BookLibrary.updateLastRead(
+  DatabaseService.updateLastRead(
     book.id,
   ).whenComplete(() => env.bookstore.getBooks());
 }
 
-void _epubViewer(BookDto book) {
+void _epubViewer(Book book) {
   String filePath = book.filePath;
   var epubFile = File(filePath);
   if (epubFile.existsSync()) {
@@ -32,7 +32,7 @@ void _epubViewer(BookDto book) {
     );
 
     VocsyEpub.locatorStream.listen((locator) {
-      BookLibrary.updateLastReadLocator(
+      DatabaseService.updateLastReadLocator(
         book.id,
         locator,
       ).whenComplete(() => env.bookstore.getBooks());
@@ -45,7 +45,9 @@ void _epubViewer(BookDto book) {
           : EpubLocator.fromJson(jsonDecode(book.lastReadLocator)),
     );
   } else {
-    BookLibrary.delete(book.id).whenComplete(() => env.bookstore.getBooks());
+    DatabaseService.deleteBook(
+      book.id,
+    ).whenComplete(() => env.bookstore.getBooks());
   }
 }
 

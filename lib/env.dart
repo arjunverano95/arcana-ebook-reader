@@ -1,4 +1,4 @@
-import 'package:arcana_ebook_reader/util/hiveContext.dart';
+import 'package:arcana_ebook_reader/services/database_service.dart';
 import 'package:arcana_ebook_reader/util/navigation.dart';
 import 'stores/bookstore.dart';
 
@@ -9,21 +9,19 @@ class BuildEnvironment {
   /// The backend server.
   final Bookstore bookstore;
   final Navigation navigation;
-  final HiveContext context;
 
-  BuildEnvironment._init(
-      {required this.context,
-      required this.bookstore,
-      required this.navigation});
+  BuildEnvironment._init({required this.bookstore, required this.navigation});
 
   /// Sets up the top-level [env] getter on the first call only.
   static Future<void> init() async {
-    var context = HiveContext();
-    await context.init();
+    // Initialize database
+    await DatabaseService.initialize();
 
     //Get env Config
     _env = BuildEnvironment._init(
-        context: context, bookstore: Bookstore(), navigation: Navigation());
+      bookstore: Bookstore(),
+      navigation: Navigation(),
+    );
     await _env.bookstore.getBooks();
   }
 }

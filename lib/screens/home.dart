@@ -5,9 +5,9 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
-import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
 import 'package:arcana_ebook_reader/extension.dart';
+import 'package:arcana_ebook_reader/models/Book.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:arcana_ebook_reader/widgets/importBooks.dart';
@@ -168,9 +168,9 @@ class HomeBodyState extends State<HomeBody>
   }
 
   Widget _buildRecentRead() {
-    BookDto? recentRead;
+    Book? recentRead;
     if (env.bookstore.books.isNotEmpty) {
-      List<BookDto> recentReads = List.from(
+      List<Book> recentReads = List.from(
         env.bookstore.books.where((item) => item.lastRead != null),
       );
 
@@ -221,7 +221,7 @@ class HomeBodyState extends State<HomeBody>
   }
 
   Widget _buildRecentlyAdded() {
-    List<BookDto> recentAdded = [];
+    List<Book> recentAdded = [];
     if (env.bookstore.books.isNotEmpty) {
       recentAdded = List.from(env.bookstore.books);
       recentAdded.sort((a, b) => b.addedDate.compareTo(a.addedDate));

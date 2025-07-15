@@ -9,8 +9,9 @@ A modern, open-source Flutter ebook reader supporting EPUB (with metadata extrac
 - 🏷️ Extracts and displays real title, author, and cover from EPUBs
 - ⭐ Favorites, recently read, and search
 - 🖼️ Custom cover support (with fallback)
-- 🧹 Modern codebase, optimized for performance
+- 🦾 Modern codebase, optimized for performance
 - 🛠️ Makefile for all dev/build tasks
+- 🗄️ **Robust local database using Drift (SQLite)**
 
 ## Getting Started
 
@@ -47,17 +48,26 @@ flutter build ios --release
 
 - Use the `Makefile` for common tasks (formatting, analyze, build, etc.)
 - All scripts from the old `package.json` are now in the Makefile.
+- **Code generation:**
+  - Run `make update-stores` to generate code for Drift (database) and MobX (stores).
 
 ## EPUB Metadata Extraction
 
 - Uses a pure Dart parser to extract title, author, and cover from EPUB files on import.
 - If metadata is missing, falls back to filename and default cover.
 
+## Database Architecture
+
+- Uses [Drift](https://drift.simonbinder.eu/) (SQLite) for all local storage and queries.
+- All data is managed in a robust, queryable SQL database.
+- Code generation for database tables and DAOs is handled by Drift and build_runner.
+
 ## Dependencies
 
+- `drift` (SQLite database)
+- `sqlite3_flutter_libs` (native SQLite for Flutter)
 - `vocsy_epub_viewer` (EPUB viewing)
 - `archive` (EPUB metadata extraction)
-- `hive` (local storage)
 - `file_picker`, `permission_handler`, `uuid`, `image`, etc.
 
 ## Contributing

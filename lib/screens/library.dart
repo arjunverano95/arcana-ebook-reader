@@ -1,12 +1,13 @@
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
-import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
+import 'package:arcana_ebook_reader/models/Book.dart';
 import 'package:arcana_ebook_reader/util/customColors.dart';
 import 'package:arcana_ebook_reader/widgets/bookTile.dart';
 import 'package:arcana_ebook_reader/widgets/importBooks.dart';
@@ -51,8 +52,8 @@ class LibraryBodyState extends State<LibraryBody> {
     super.dispose();
   }
 
-  List<BookDto> _getFilteredBooks() {
-    List<BookDto> books = List.from(env.bookstore.books);
+  List<Book> _getFilteredBooks() {
+    List<Book> books = List.from(env.bookstore.books);
 
     // Apply search filter
     if (_searchQuery.isNotEmpty) {
@@ -253,7 +254,7 @@ class LibraryBodyState extends State<LibraryBody> {
     );
   }
 
-  Widget _buildListView(List<BookDto> books) {
+  Widget _buildListView(List<Book> books) {
     return ListView.separated(
       shrinkWrap: true,
       primary: false,
@@ -273,7 +274,7 @@ class LibraryBodyState extends State<LibraryBody> {
     );
   }
 
-  Widget _buildGridView(List<BookDto> books) {
+  Widget _buildGridView(List<Book> books) {
     return GridView.builder(
       shrinkWrap: true,
       primary: false,
@@ -298,7 +299,7 @@ class LibraryBodyState extends State<LibraryBody> {
     );
   }
 
-  Widget _buildGridBookCard(BookDto book) {
+  Widget _buildGridBookCard(Book book) {
     return InkWell(
       onTap: () => _openBook(book),
       borderRadius: BorderRadius.circular(12.r),
@@ -398,7 +399,7 @@ class LibraryBodyState extends State<LibraryBody> {
     );
   }
 
-  Widget _buildBookCover(BookDto book) {
+  Widget _buildBookCover(Book book) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.r),
@@ -498,15 +499,13 @@ class LibraryBodyState extends State<LibraryBody> {
     );
   }
 
-  void _openBook(BookDto book) {
+  void _openBook(Book book) {
     // TODO: Implement book opening
   }
 
-  void _toggleFavorite(BookDto book) {
-    setState(() {
-      book.isFavorite = book.isFavorite == 1 ? 0 : 1;
-    });
-    // TODO: Update in database
+  void _toggleFavorite(Book book) {
+    // Call the store method to update favorite status
+    env.bookstore.toggleFavorite(book.id);
   }
 
   @override

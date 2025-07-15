@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:epub_viewer/epub_viewer.dart';
+import 'package:vocsy_epub_viewer/epub_viewer.dart';
 
 import 'package:arcana_ebook_reader/dto/BookDtos.dart';
 import 'package:arcana_ebook_reader/env.dart';
@@ -13,35 +13,36 @@ Future<void> readEbook(BookDto book) async {
     _epubViewer(book);
   }
 
-  BookLibrary.updateLastRead(book.id)
-      .whenComplete(() => env.bookstore.getBooks());
+  BookLibrary.updateLastRead(
+    book.id,
+  ).whenComplete(() => env.bookstore.getBooks());
 }
 
 void _epubViewer(BookDto book) {
   String filePath = book.filePath;
   var epubFile = File(filePath);
   if (epubFile.existsSync()) {
-    EpubViewer.setConfig(
+    VocsyEpub.setConfig(
       themeColor: CustomColors.normal,
       identifier: "book",
-      scrollDirection: EpubScrollDirection.VERTICAL,
+      scrollDirection: EpubScrollDirection.ALLDIRECTIONS,
       allowSharing: true,
       enableTts: true,
       nightMode: false,
     );
 
-    EpubViewer.locatorStream.listen((locator) {
-      BookLibrary.updateLastReadLocator(book.id, locator)
-          .whenComplete(() => env.bookstore.getBooks());
+    VocsyEpub.locatorStream.listen((locator) {
+      BookLibrary.updateLastReadLocator(
+        book.id,
+        locator,
+      ).whenComplete(() => env.bookstore.getBooks());
     });
 
-    EpubViewer.open(
+    VocsyEpub.open(
       filePath,
       lastLocation: book.lastReadLocator == ""
           ? null
-          : EpubLocator.fromJson(
-              jsonDecode(book.lastReadLocator),
-            ),
+          : EpubLocator.fromJson(jsonDecode(book.lastReadLocator)),
     );
   } else {
     BookLibrary.delete(book.id).whenComplete(() => env.bookstore.getBooks());

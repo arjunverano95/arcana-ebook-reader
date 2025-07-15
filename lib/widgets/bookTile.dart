@@ -17,11 +17,12 @@ class BookTile extends StatefulWidget {
   final CoverSize size;
   final bool infoOnly;
 
-  const BookTile(
-      {super.key,
-      required this.book,
-      this.size = CoverSize.md,
-      this.infoOnly = false});
+  const BookTile({
+    super.key,
+    required this.book,
+    this.size = CoverSize.md,
+    this.infoOnly = false,
+  });
 
   @override
   BookTileState createState() => BookTileState();
@@ -59,7 +60,7 @@ class BookTileState extends State<BookTile> {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     spreadRadius: 1,
                     blurRadius: 3,
                     offset: const Offset(0, 3),
@@ -67,17 +68,22 @@ class BookTileState extends State<BookTile> {
                 ],
               ),
               child: ClipRect(
-                  child: Stack(
-                children: <Widget>[
-                  Image.asset('assets/images/no_cover.jpg',
-                      fit: BoxFit.fitWidth, key: const Key("cv_none")),
-                  Image.memory(
-                    Uint8List.fromList(book.coverImageData),
-                    fit: BoxFit.fitWidth,
-                    key: Key("cv_${book.id}"),
-                  ),
-                ],
-              )),
+                child: Stack(
+                  children: <Widget>[
+                    Image.asset(
+                      'assets/images/no_cover.jpg',
+                      fit: BoxFit.fitWidth,
+                      key: const Key("cv_none"),
+                    ),
+                    if (book.coverImageData.isNotEmpty)
+                      Image.memory(
+                        Uint8List.fromList(book.coverImageData),
+                        fit: BoxFit.fitWidth,
+                        key: Key("cv_${book.id}"),
+                      ),
+                  ],
+                ),
+              ),
             ),
             Expanded(
               child: Container(
@@ -96,9 +102,10 @@ class BookTileState extends State<BookTile> {
                                 ? book.title
                                 : "${book.title.substring(0, 40)}...",
                             style: TextStyle(
-                                color: CustomColors.textDark,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 30.sp),
+                              color: CustomColors.textDark,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 30.sp,
+                            ),
                           ),
                         ),
                         SizedBox(
@@ -106,27 +113,27 @@ class BookTileState extends State<BookTile> {
                           width: 50.w,
                           child: PopupMenuButton<String>(
                             padding: EdgeInsets.all(0.sp),
-                            icon: Icon(
-                              Icons.more_vert,
-                              size: 40.sp,
-                            ),
+                            icon: Icon(Icons.more_vert, size: 40.sp),
                             onSelected: (String result) {
                               if (result == "Delete") {
-                                BookLibrary.delete(book.id).whenComplete(
-                                    () => env.bookstore.getBooks());
+                                BookLibrary.delete(
+                                  book.id,
+                                ).whenComplete(() => env.bookstore.getBooks());
                               }
                             },
                             itemBuilder: (BuildContext context) =>
                                 <PopupMenuEntry<String>>[
-                              PopupMenuItem<String>(
-                                value: "Delete",
-                                child: Text('Delete',
-                                    style: TextStyle(
-                                      color: CustomColors.textNormal,
-                                      fontSize: 28.sp,
-                                    )),
-                              ),
-                            ],
+                                  PopupMenuItem<String>(
+                                    value: "Delete",
+                                    child: Text(
+                                      'Delete',
+                                      style: TextStyle(
+                                        color: CustomColors.textNormal,
+                                        fontSize: 28.sp,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                           ),
                         ),
                       ],
@@ -158,9 +165,10 @@ class BookTileState extends State<BookTile> {
                               decoration: BoxDecoration(
                                 border: Border(
                                   top: BorderSide(
-                                      width: 1,
-                                      color: CustomColors.normal,
-                                      style: BorderStyle.solid),
+                                    width: 1,
+                                    color: CustomColors.normal,
+                                    style: BorderStyle.solid,
+                                  ),
                                 ),
                               ),
                               child: Row(
@@ -179,9 +187,7 @@ class BookTileState extends State<BookTile> {
                                       onPressed: () {},
                                     ),
                                   ),
-                                  Container(
-                                    width: 20.w,
-                                  ),
+                                  Container(width: 20.w),
                                   SizedBox(
                                     height: 52.w,
                                     width: 52.w,
@@ -195,9 +201,7 @@ class BookTileState extends State<BookTile> {
                                       onPressed: () {},
                                     ),
                                   ),
-                                  Container(
-                                    width: 20.w,
-                                  ),
+                                  Container(width: 20.w),
                                   SizedBox(
                                     height: 52.w,
                                     width: 52.w,
@@ -213,23 +217,26 @@ class BookTileState extends State<BookTile> {
                                           ? Colors.red
                                           : CustomColors.normal,
                                       onPressed: () {
-                                        BookLibrary.updateFavorite(book.id)
-                                            .whenComplete(
-                                                () => env.bookstore.getBooks());
+                                        BookLibrary.updateFavorite(
+                                          book.id,
+                                        ).whenComplete(
+                                          () => env.bookstore.getBooks(),
+                                        );
                                         setState(() {
-                                          book.isFavorite =
-                                              book.isFavorite == 1 ? 0 : 1;
+                                          book.isFavorite = book.isFavorite == 1
+                                              ? 0
+                                              : 1;
                                         });
                                       },
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),

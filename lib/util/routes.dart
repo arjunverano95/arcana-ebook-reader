@@ -17,8 +17,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case 'library':
       return MaterialPageRoute(
           settings: settings, builder: (context) => const Library());
-
-// TODO
     default:
       return MaterialPageRoute(
         builder: (context) => const SafeArea(

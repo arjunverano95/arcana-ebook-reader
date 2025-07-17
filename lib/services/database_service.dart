@@ -32,7 +32,7 @@ class DatabaseService {
       if (filePath.isEmpty) return noCoverImage;
 
       // For now, return the default cover image
-      // In a future implementation, you could extract cover from EPUB using vocsy_epub_viewer
+      // In a future implementation, you could extract cover from EPUB using flutter_epub_viewer
       // or implement a separate EPUB parser for metadata extraction
       return noCoverImage;
     } catch (ex) {

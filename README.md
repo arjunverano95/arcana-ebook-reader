@@ -4,7 +4,7 @@ A modern, open-source Flutter ebook reader supporting EPUB (with metadata extrac
 
 ## Features
 
-- 📖 **EPUB Reading** (with [vocsy_epub_viewer](https://pub.dev/packages/vocsy_epub_viewer))
+- 📖 **EPUB Reading** (with [flutter_epub_viewer](https://pub.dev/packages/flutter_epub_viewer))
 - 📚 Import books from device storage
 - 🏷️ Extracts and displays real title, author, and cover from EPUBs
 - ⭐ Favorites, recently read, and search
@@ -66,7 +66,7 @@ flutter build ios --release
 
 - `drift` (SQLite database)
 - `sqlite3_flutter_libs` (native SQLite for Flutter)
-- `vocsy_epub_viewer` (EPUB viewing)
+- `flutter_epub_viewer` (EPUB viewing)
 - `archive` (EPUB metadata extraction)
 - `file_picker`, `permission_handler`, `uuid`, `image`, etc.
 

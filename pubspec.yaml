@@ -38,9 +38,9 @@ dependencies:
   uuid: ^4.5.1
   flutter_staggered_animations: ^1.1.1
   file_picker: ^10.2.0
-  vocsy_epub_viewer: ^3.0.0
   image: ^4.5.4
   archive: ^4.0.7
+  flutter_epub_viewer: ^1.2.2
 
 dev_dependencies:
   build_runner: ^2.5.4
